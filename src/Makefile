@@ -43,7 +43,7 @@ NO_STDERR	= 2> /dev/null
 TARGET 		= AntTweakBar
 
 # source files without extension:
-SRC_FILES	= TwColors.cpp TwFonts.cpp TwOpenGL.cpp TwOpenGLCore.cpp TwBar.cpp TwMgr.cpp TwPrecomp.cpp LoadOGL.cpp LoadOGLCore.cpp TwEventGLFW.c TwEventGLUT.c TwEventSDL.c TwEventSDL12.c TwEventSDL13.c TwEventSDL20.c TwEventSFML.cpp TwEventX11.c
+SRC_FILES	= TwColors.cpp TwFonts.cpp TwOpenGL.cpp TwOpenGLCore.cpp TwBar.cpp TwMgr.cpp TwPrecomp.cpp LoadOGL.cpp LoadOGLCore.cpp TwEventGLFW.c TwEvwntGLFW3.c TwEventGLUT.c TwEventSDL.c TwEventSDL12.c TwEventSDL13.c TwEventSDL20.c TwEventSFML.cpp TwEventX11.c
 
 # build object list from source files
 OBJS_1 		= $(SRC_FILES:.c=.o)
@@ -95,6 +95,7 @@ TwMgr.o:       TwPrecomp.h ../include/AntTweakBar.h TwMgr.h TwColors.h TwFonts.h
 TwPrecomp.o:   TwPrecomp.h
 LoadOGL.o:     TwPrecomp.h LoadOGL.h
 TwEventGLFW.o: ../include/AntTweakBar.h MiniGLFW.h
+TwEventGLFW3.o: ../include/AntTweakBar.h MiniGLFW3.h
 TwEventGLUT.o: ../include/AntTweakBar.h MiniGLUT.h
 TwEventSDL.o:  ../include/AntTweakBar.h
 TwEventSDL12.o:  ../include/AntTweakBar.h MiniSDL12.h

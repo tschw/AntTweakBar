@@ -74,6 +74,9 @@
     <ClCompile Include="TwPrecomp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TwEventGLFW3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\AntTweakBar.h">
@@ -140,6 +143,9 @@
       <Filter>Private Header Files</Filter>
     </ClInclude>
     <ClInclude Include="res\TwXCursors.h">
+      <Filter>Private Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniGLFW3.h">
       <Filter>Private Header Files</Filter>
     </ClInclude>
   </ItemGroup>

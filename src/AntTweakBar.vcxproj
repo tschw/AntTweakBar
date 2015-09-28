@@ -345,6 +345,16 @@ fxc /Od /Zi /T ps_4_0_level_9_1 /E TextPS /Fh $(IntDir)TwDirect3D11_TextPS.h TwD
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TwEventGLFW3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="TwEventGLUT.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -440,6 +450,7 @@ fxc /Od /Zi /T ps_4_0_level_9_1 /E TextPS /Fh $(IntDir)TwDirect3D11_TextPS.h TwD
     <ClInclude Include="LoadOGL.h" />
     <ClInclude Include="LoadOGLCore.h" />
     <ClInclude Include="MiniGLFW.h" />
+    <ClInclude Include="MiniGLFW3.h" />
     <ClInclude Include="MiniGLUT.h" />
     <ClInclude Include="MiniSDL12.h" />
     <ClInclude Include="MiniSDL13.h" />
