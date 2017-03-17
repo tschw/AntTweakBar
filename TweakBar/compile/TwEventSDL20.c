@@ -11,6 +11,7 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_SDL20_EVENTS
 
 #include "MiniSDL20.h"
 #include <AntTweakBar.h>
@@ -114,3 +115,5 @@ int TW_CALL TwEventSDL20(const void *sdlEvent)
 
     return handled;
 }
+
+#endif

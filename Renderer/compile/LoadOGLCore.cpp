@@ -7,6 +7,7 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined ANT_TO_NO_CORE_GL
 
 #include "TwPrecomp.h"
 #include "LoadOGLCore.h"
@@ -537,3 +538,5 @@ namespace GLCore { PFNGLGetProcAddress _glGetProcAddress = NULL; }
 #endif
 
 //  ---------------------------------------------------------------------------
+
+#endif // !defined ANT_TW_NO_CORE_GL

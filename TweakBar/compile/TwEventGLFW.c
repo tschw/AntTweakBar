@@ -11,6 +11,8 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_GLFW_EVENTS
+
 // #include <GL/glfw.h>
 #include "MiniGLFW.h" // a subset of GLFW.h needed to compile TwEventGLFW.c
 // note: AntTweakBar.dll does not need to link with GLFW, 
@@ -210,3 +212,5 @@ TW_API int TW_CDECL_CALL TwEventMouseWheelGLFWcdecl(int wheelPos)
 {
     return TwMouseWheel(wheelPos);
 }
+
+#endif // !defined TW_NO_GLFW_EVENTS

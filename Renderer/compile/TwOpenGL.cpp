@@ -7,6 +7,7 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined ANT_TW_NO_LEGACY_GL
 
 #include "TwPrecomp.h"
 #include "LoadOGL.h"
@@ -14,8 +15,8 @@
 
 using namespace std;
 
-static const char *g_ErrCantLoadOGL    = "Cannot load legacy OpenGL library dynamically";
-static const char *g_ErrCantUnloadOGL  = "Cannot unload legacy OpenGL library";
+static const char *g_ErrCantLoadOGL    = "Cannot load OpenGL library dynamically";
+static const char *g_ErrCantUnloadOGL  = "Cannot unload OpenGL library";
 
 GLuint g_SmallFontTexID = 0;
 GLuint g_NormalFontTexID = 0;
@@ -903,3 +904,5 @@ void CTwGraphOpenGL::DrawTriangles(int _NumTriangles, int *_Vertices, color32 *_
 }
 
 //  ---------------------------------------------------------------------------
+
+#endif // ANT_TW_NO_LEGACY_GL

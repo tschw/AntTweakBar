@@ -11,6 +11,7 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_SDL13_EVENTS
 
 #include "MiniSDL13.h" // a subset of SDL.h needed to compile TwEventSDL.c
 // note: AntTweakBar.dll does not need to link with SDL, 
@@ -127,3 +128,5 @@ int TW_CALL TwEventSDL13(const void *sdlEvent)
 
     return handled;
 }
+
+#endif // !defined TW_NO_SDL13_EVENTS

@@ -12,6 +12,7 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_GLUT_EVENTS
 
 #define GLUT_NO_LIB_PRAGMA          // we do not want to force linkage with glut
 #ifdef _MSC_VER
@@ -147,4 +148,5 @@ int TW_GLUT_CALL TwEventSpecialGLUT(int glutKey, int mouseX, int mouseY)
         return 0;
 }
 
+#endif // !defined TW_NO_GLUT_EVENTS
 

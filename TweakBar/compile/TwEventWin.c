@@ -12,6 +12,8 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_WINDOWS_EVENT
+
 #include <AntTweakBar.h>
 
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -254,3 +256,5 @@ TW_EXPORT_API int TW_CALL TwEventWin32(void *wnd, unsigned int msg, unsigned int
 #ifdef  __cplusplus
 }
 #endif // __cplusplus
+
+#endif // !defined TW_NO_WINDOWS_EVENT

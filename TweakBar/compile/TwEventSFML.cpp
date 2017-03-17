@@ -11,6 +11,7 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_SFML_EVENTS
 
 #include "MiniSFML16.h" // a subset of SFML 1.6 headers needed to compile TwEventSFML.cpp
 // note: AntTweakBar.dll does not need to link with SFML, 
@@ -171,3 +172,5 @@ int TW_CALL TwEventSFML(const void *sfmlEvent, unsigned char majorVersion, unsig
 
     return handled;
 }
+
+#endif // !defined TW_NO_SFML_EVENTS
