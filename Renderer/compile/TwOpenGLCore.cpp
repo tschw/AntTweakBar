@@ -83,8 +83,18 @@ static void UnbindFont(GLuint _FontTexID)
 
 //  ---------------------------------------------------------------------------
 
-static GLuint CompileShader(GLuint shader)
+static GLuint CompileShader(GLchar const* source, GLuint shader)
 {
+
+    char const* glVersion = (char const*) _glGetString( GL_VERSION );
+    bool isGlES = strncmp( glVersion, "OpenGL ES", 9 ) == 0;
+
+    char const* sourceStrings[2];
+    sourceStrings[ 0 ] = isGlES ? "#version 100\n" : "#version 150\n";
+
+    sourceStrings[ 1 ] = source;
+
+    _glShaderSource(shader, 2, sourceStrings, NULL);
     _glCompileShader(shader); CHECK_GL_ERROR;
 
     GLint status;
@@ -168,27 +178,24 @@ int CTwGraphOpenGLCore::Init()
     }
 
     // Create line/rect shaders
-    const GLchar *lineRectVS[] = {
-        "#version 150 core\n"
-        "in vec3 vertex;"
-        "in vec4 color;"
-        "out vec4 fcolor;"
-        "void main() { gl_Position = vec4(vertex, 1); fcolor = color; }"
-    };
-    m_LineRectVS = _glCreateShader(GL_VERTEX_SHADER);
-    _glShaderSource(m_LineRectVS, 1, lineRectVS, NULL);
-    CompileShader(m_LineRectVS);
+    const GLchar *lineRectVS =
+            "precision highp float;"
+            "in vec3 vertex;"
+            "in vec4 color;"
+            "out vec4 fcolor;"
+            "void main() { gl_Position = vec4(vertex, 1); fcolor = color; }";
 
-    const GLchar *lineRectFS[] = {
-        "#version 150 core\n"
-        "precision highp float;"
-        "in vec4 fcolor;"
-        "out vec4 outColor;"
-        "void main() { outColor = fcolor; }"
-    };
+    m_LineRectVS = _glCreateShader(GL_VERTEX_SHADER);
+    CompileShader(lineRectVS, m_LineRectVS);
+
+    const GLchar *lineRectFS =
+            "precision highp float;"
+            "in vec4 fcolor;"
+            "out vec4 outColor;"
+            "void main() { outColor = fcolor; }";
+
     m_LineRectFS = _glCreateShader(GL_FRAGMENT_SHADER);
-    _glShaderSource(m_LineRectFS, 1, lineRectFS, NULL);
-    CompileShader(m_LineRectFS);
+    CompileShader(lineRectFS, m_LineRectFS);
 
     m_LineRectProgram = _glCreateProgram();
     _glAttachShader(m_LineRectProgram, m_LineRectVS);
@@ -210,31 +217,35 @@ int CTwGraphOpenGLCore::Init()
     _glBufferData(GL_ARRAY_BUFFER, sizeof(lineRectInitColors), lineRectInitColors, GL_DYNAMIC_DRAW);
 
     // Create triangles shaders
-    const GLchar *triVS[] = {
-        "#version 150 core\n"
-        "uniform vec2 offset;"
-        "uniform vec2 wndSize;"
-        "in vec2 vertex;"
-        "in vec4 color;"
-        "out vec4 fcolor;"
-        "void main() { gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1); fcolor = color; }"
-    };
-    m_TriVS = _glCreateShader(GL_VERTEX_SHADER);
-    _glShaderSource(m_TriVS, 1, triVS, NULL);
-    CompileShader(m_TriVS);
+    const GLchar *triVS =
+            "precision highp float;"
+            "uniform vec2 offset;"
+            "uniform vec2 wndSize;"
+            "in vec2 vertex;"
+            "in vec4 color;"
+            "out vec4 fcolor;"
+            "void main() {"
+            " gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
+            " fcolor = color;"
+            "}";
 
-    const GLchar *triUniVS[] = {
-        "#version 150 core\n"
-        "uniform vec2 offset;"
-        "uniform vec2 wndSize;"
-        "uniform vec4 color;"
-        "in vec2 vertex;"
-        "out vec4 fcolor;"
-        "void main() { gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1); fcolor = color; }"
-    };
+    m_TriVS = _glCreateShader(GL_VERTEX_SHADER);
+    CompileShader(triVS, m_TriVS);
+
+    const GLchar *triUniVS =
+            "precision highp float;"
+            "uniform vec2 offset;"
+            "uniform vec2 wndSize;"
+            "uniform vec4 color;"
+            "in vec2 vertex;"
+            "out vec4 fcolor;"
+            "void main() {"
+            " gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
+            " fcolor = color;"
+            "}";
+
     m_TriUniVS = _glCreateShader(GL_VERTEX_SHADER);
-    _glShaderSource(m_TriUniVS, 1, triUniVS, NULL);
-    CompileShader(m_TriUniVS);
+    CompileShader(triUniVS, m_TriUniVS);
 
     m_TriFS = m_TriUniFS = m_LineRectFS;
 
@@ -257,54 +268,56 @@ int CTwGraphOpenGLCore::Init()
     m_TriUniLocationWndSize = _glGetUniformLocation(m_TriUniProgram, "wndSize");
     m_TriUniLocationColor = _glGetUniformLocation(m_TriUniProgram, "color");
 
-    const GLchar *triTexFS[] = {
-        "#version 150 core\n"
-        "precision highp float;"
-        "uniform sampler2D tex;"
-        "in vec2 fuv;"
-        "in vec4 fcolor;"
-        "out vec4 outColor;"
-// texture2D is deprecated and replaced by texture with GLSL 3.30 but it seems 
-// that on Mac Lion backward compatibility is not ensured.
-#if defined(ANT_OSX) && (MAC_OS_X_VERSION_MAX_ALLOWED >= 1070)
-        "void main() { outColor.rgb = fcolor.bgr; outColor.a = fcolor.a * texture(tex, fuv).r; }"
-#else
-        "void main() { outColor.rgb = fcolor.bgr; outColor.a = fcolor.a * texture2D(tex, fuv).r; }"
-#endif
-    };
-    m_TriTexFS = _glCreateShader(GL_FRAGMENT_SHADER);
-    _glShaderSource(m_TriTexFS, 1, triTexFS, NULL);
-    CompileShader(m_TriTexFS);
+    const GLchar *triTexFS =
+            "precision highp float;"
+            "uniform sampler2D tex;"
+            "in vec2 fuv;"
+            "in vec4 fcolor;"
+            "out vec4 outColor;"
+            "\n#if __VERSION__ >= 130\n"
+            "void main() { outColor.rgb = fcolor.bgr; outColor.a = fcolor.a * texture(tex, fuv).r; }"
+            "\n#else\n"
+            "void main() { outColor.rgb = fcolor.bgr; outColor.a = fcolor.a * texture2D(tex, fuv).r; }"
+            "\n#endif\n";
 
-    const GLchar *triTexVS[] = {
-        "#version 150 core\n"
-        "uniform vec2 offset;"
-        "uniform vec2 wndSize;"
-        "in vec2 vertex;"
-        "in vec2 uv;"
-        "in vec4 color;"
-        "out vec2 fuv;"
-        "out vec4 fcolor;"
-        "void main() { gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1); fuv = uv; fcolor = color; }"
-    };
+	m_TriTexFS = _glCreateShader(GL_FRAGMENT_SHADER);
+    CompileShader(triTexFS, m_TriTexFS);
+
+    const GLchar *triTexVS =
+            "precision highp float;"
+            "uniform vec2 offset;"
+            "uniform vec2 wndSize;"
+            "in vec2 vertex;"
+            "in vec2 uv;"
+            "in vec4 color;"
+            "out vec2 fuv;"
+            "out vec4 fcolor;"
+            "void main() {"
+            " gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
+            " fuv = uv;"
+            " fcolor = color;"
+            "}";
+
     m_TriTexVS = _glCreateShader(GL_VERTEX_SHADER);
-    _glShaderSource(m_TriTexVS, 1, triTexVS, NULL);
-    CompileShader(m_TriTexVS);
+    CompileShader(triTexVS, m_TriTexVS);
 
-    const GLchar *triTexUniVS[] = {
-        "#version 150 core\n"
-        "uniform vec2 offset;"
-        "uniform vec2 wndSize;"
-        "uniform vec4 color;"
-        "in vec2 vertex;"
-        "in vec2 uv;"
-        "out vec4 fcolor;"
-        "out vec2 fuv;"
-        "void main() { gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1); fuv = uv; fcolor = color; }"
-    };
+    const GLchar *triTexUniVS =
+            "precision highp float;"
+            "uniform vec2 offset;"
+            "uniform vec2 wndSize;"
+            "uniform vec4 color;"
+            "in vec2 vertex;"
+            "in vec2 uv;"
+            "out vec4 fcolor;"
+            "out vec2 fuv;"
+            "void main() {"
+            " gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
+            " fuv = uv;"
+            " fcolor = color;"
+            "}";
+
     m_TriTexUniVS = _glCreateShader(GL_VERTEX_SHADER);
-    _glShaderSource(m_TriTexUniVS, 1, triTexUniVS, NULL);
-    CompileShader(m_TriTexUniVS);
+    CompileShader(triTexUniVS, m_TriTexUniVS);
 
     m_TriTexUniFS = m_TriTexFS;
 
