@@ -282,7 +282,7 @@ int CTwGraphOpenGLCore::Init()
             "void main() { outColor.rgb = fcolor.bgr; outColor.a = fcolor.a * texture2D(tex, fuv).r; }"
             "\n#endif\n";
 
-	m_TriTexFS = _glCreateShader(GL_FRAGMENT_SHADER);
+    m_TriTexFS = _glCreateShader(GL_FRAGMENT_SHADER);
     CompileShader(triTexFS, m_TriTexFS);
 
     const GLchar *triTexVS =
@@ -457,10 +457,6 @@ void CTwGraphOpenGLCore::BeginDraw(int _WndWidth, int _WndHeight)
     _glGetIntegerv(GL_BLEND_DST, &m_PrevDstBlend); CHECK_GL_ERROR;
     _glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECK_GL_ERROR;
 
-    m_PrevTexture = 0;
-    _glGetIntegerv(GL_TEXTURE_BINDING_2D, &m_PrevTexture); CHECK_GL_ERROR;
-    _glBindTexture(GL_TEXTURE_2D, 0); CHECK_GL_ERROR;
-
     m_PrevProgramObject = 0;
     _glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&m_PrevProgramObject); CHECK_GL_ERROR;
     _glBindVertexArray(0); CHECK_GL_ERROR;
@@ -468,7 +464,12 @@ void CTwGraphOpenGLCore::BeginDraw(int _WndWidth, int _WndHeight)
 
     m_PrevActiveTexture = 0;
     _glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*)&m_PrevActiveTexture); CHECK_GL_ERROR;
-    _glActiveTexture(GL_TEXTURE0);
+
+    _glActiveTexture(GL_TEXTURE0); // this is the one we'll be using
+
+    m_PrevTexture = 0;
+    _glGetIntegerv(GL_TEXTURE_BINDING_2D, &m_PrevTexture); CHECK_GL_ERROR;
+    _glBindTexture(GL_TEXTURE_2D, 0); CHECK_GL_ERROR;
 
     CHECK_GL_ERROR;
 }
@@ -532,6 +533,8 @@ void CTwGraphOpenGLCore::EndDraw()
     _glBlendFunc(m_PrevSrcBlend, m_PrevDstBlend); CHECK_GL_ERROR;
 
     _glBindTexture(GL_TEXTURE_2D, m_PrevTexture); CHECK_GL_ERROR;
+
+    _glActiveTexture(m_PrevActiveTexture); // must come after texture restore
 
     _glUseProgram(m_PrevProgramObject); CHECK_GL_ERROR;
 
@@ -811,7 +814,6 @@ void CTwGraphOpenGLCore::DrawText(void *_TextObj, int _X, int _Y, color32 _Color
     // draw character triangles
     if( TextObj->m_TextVerts.size()>=4 )
     {
-        _glActiveTexture(GL_TEXTURE0);
         _glBindTexture(GL_TEXTURE_2D, m_FontTexID);
         size_t numTextVerts = TextObj->m_TextVerts.size();
         if( numTextVerts > m_TriBufferSize )
