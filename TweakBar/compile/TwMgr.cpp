@@ -1857,7 +1857,7 @@ int ANT_CALL TwInit(ETwGraphAPI _GraphAPI, void *_Device)
     g_TwMgr->m_CurrentFont = g_DefaultNormalFont;
 
     int Res = 0;
-    g_TwMgr->m_Graph = ITwGraph::Create(_GraphAPI, _Device);
+    g_TwMgr->m_Graph = ITwGraph::CreateForAPI(_GraphAPI, _Device);
     if( g_TwMgr != NULL )
         Res = TwInitMgr();
     else

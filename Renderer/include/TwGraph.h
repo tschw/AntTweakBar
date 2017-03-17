@@ -19,17 +19,6 @@
 
 //  ---------------------------------------------------------------------------
 
-typedef enum ETwGraphAPI
-{
-    TW_OPENGL           = 1,
-    TW_DIRECT3D9        = 2,
-    TW_DIRECT3D10       = 3,
-    TW_DIRECT3D11       = 4,
-    TW_OPENGL_CORE      = 5
-} TwGraphAPI;
-
-//  ---------------------------------------------------------------------------
-
 #ifdef DrawText     // DirectX redefines 'DrawText' !!
 #   undef DrawText
 #endif  // DrawText
@@ -38,9 +27,9 @@ class ITwGraph
 {
 public:
 
-    static ITwGraph*    Create(ETwGraphAPI _GraphAPI, void* d3dDevice = 0l);
-	static bool			Delete(ITwGraph*);
+	static ITwGraph*	CreateForAPI(int, void* = 0l); //  TwInit signature
 
+	static bool			Delete(ITwGraph*);
     static const char*  GetErrorState();
 
 

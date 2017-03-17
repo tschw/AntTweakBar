@@ -11,9 +11,18 @@
 #include "TwDirect3D11.h"
 #endif
 
+// Don't link anything - we just need an enum!
+#ifndef TW_STATIC
+#define TW_STATIC
+#endif
+#ifndef TW_NO_LIB_PRAGMA
+#define TW_NO_LIB_PRAGMA
+#endif
+#include "../../TweakBar/include/AntTweakBar.h"
+
 char const* ITwGraph::g_ErrorState = NULL;
 
-ITwGraph* ITwGraph::Create(ETwGraphAPI _GraphAPI, void* _D3DDevice)
+ITwGraph* ITwGraph::CreateForAPI(int _GraphAPI, void* _D3DDevice)
 {
     ITwGraph* result;
     g_ErrorState = NULL;
