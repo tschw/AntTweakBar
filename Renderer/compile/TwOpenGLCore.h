@@ -14,6 +14,8 @@
 #if !defined ANT_TW_OPENGL_CORE_INCLUDED
 #define ANT_TW_OPENGL_CORE_INCLUDED
 
+#if !defined ANT_TW_NO_CORE_GL
+
 #include "TwGraph.h"
 
 //  ---------------------------------------------------------------------------
@@ -117,5 +119,5 @@ protected:
 
 //  ---------------------------------------------------------------------------
 
-
+#endif // !defined ANT_TW_No_CORE_GL
 #endif // !defined ANT_TW_OPENGL_CORE_INCLUDED

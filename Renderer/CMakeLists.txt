@@ -1,3 +1,41 @@
+set(target ATBGuiRenderer)
+
+###############################################################################
+# OpenGL Configuration
+
+#set(ATB_GUIRENDERER_LOAD_GL		ON		CACHE BOOL
+#		"Embed OpenGL loading code into the renderer")
+
+set(ATB_GUIRENDERER_USE_CORE_GL		ON		CACHE BOOL
+		"Enable OpenGL core profile rendering code")
+
+set(ATB_GUIRENDERER_USE_LEGACY_GL	ON		CACHE BOOL
+		"Enable legacy OpenGL rendering code")
+
+#mark_as_advanced(ATB_GUIRENDERER_LOAD_GL)
+
+###############################################################################
+# Direct3D Configuration
+
+if (WIN32)
+
+	set(ATB_GUIRENDERER_USE_D3D11	ON		CACHE BOOL
+			"Enable Direct3D 11 rendering code")
+
+	set(ATB_GUIRENDERER_USE_D3D10	ON		CACHE BOOL
+			"Enable Direct3D 10 rendering code")
+
+	set(ATB_GUIRENDERER_USE_D3D9	ON		CACHE BOOL
+			"Enable Direct3D 9 rendering code")
+
+else()
+
+	set(ATB_GUIRENDERER_USE_D3D11	OFF)
+	set(ATB_GUIRENDERER_USE_D3D10	OFF)
+	set(ATB_GUIRENDERER_USE_D3D9	OFF)
+
+endif()
+
 ###############################################################################
 # Files
 
@@ -37,45 +75,9 @@ set(sources
 ###############################################################################
 # Build setup
 
-add_library(ATB_GUIRenderer STATIC ${headers} ${sources})
+add_library(${target} STATIC ${headers} ${sources})
 
-
-find_program(ATB_D3D11_FXC fxc DOC "Direct3D 11 Shader Compiler")
-
-if (NOT ATB_D3D11_FXC)
-	message(SEND_ERROR "No fxc.exe for Direct3D 11 available.")
-endif()
-
-set(shaders
-		"LineRectVS"
-		"LineRectCstColorVS"
-		"LineRectPS"
-		"TextVS"
-		"TextCstColorVS"
-		"TextPS")
-
-set(input "${CMAKE_CURRENT_SOURCE_DIR}/compile/TwDirect3D11.hlsl")
-
-set(shaderTargets "")
-foreach(shader IN LISTS shaders)
-	set(target "TwDirect3D11_${shader}.h")
-	string(REGEX MATCH "..$" suffix ${shader})
-	string(TOLOWER ${suffix} prefix)
-	add_custom_command(
-		OUTPUT ${target}
-		COMMAND
-			${ATB_D3D11_FXC}
-			/T ${prefix}_4_0_level_9_1 /E ${shader}
-			/Fh ${target} ${input}
-		MAIN_DEPENDENCY ${input})
-	list(APPEND shaderTargets ${target})
-endforeach()
-
-set_property(SOURCE "compile/TwDirect3D11.cpp"
-		APPEND PROPERTY OBJECT_DEPENDS ${shaderTargets})
-
-
-target_include_directories(ATB_GUIRenderer
+target_include_directories(${target}
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
@@ -84,3 +86,41 @@ target_include_directories(ATB_GUIRenderer
 		${CMAKE_CURRENT_BINARY_DIR}
 )
 
+set(defs "")
+append_unless(defs	"ANT_TW_NO_CORE_GL"		ATB_GUIRENDERER_USE_CORE_GL)
+append_unless(defs	"ANT_TW_NO_LEGACY_GL"	ATB_GUIRENDERER_USE_LEGACY_GL)
+append_unless(defs	"ANT_TW_NO_D3D11"		ATB_GUIRENDERER_USE_D3D11)
+append_unless(defs	"ANT_TW_NO_D3D10"		ATB_GUIRENDERER_USE_D3D10)
+append_unless(defs	"ANT_TW_NO_D3D9"		ATB_GUIRENDERER_USE_D3D9)
+
+target_compile_definitions(${target} PRIVATE ${defs})
+
+set(d3d11HlslFile "compile/TwDirect3D11.hlsl")
+
+if (ATB_GUIRENDERER_USE_D3D11)
+
+	set(d3d11Renderer "compile/TwDirect3D11.cpp")
+
+	set(vertex_shaders
+			"LineRectVS"
+			"LineRectCstColorVS"
+			"TextVS"
+			"TextCstColorVS")
+
+	foreach(shader IN LISTS vertex_shaders)
+		add_hlsl_header(
+				${d3d11HlslFile} ${shader} "vs_4_0_level_9_1" ${d3d11Renderer})
+	endforeach()
+
+	set(pixel_shaders
+			"LineRectPS"
+			"TextPS")
+
+	foreach(shader IN LISTS pixel_shaders)
+		add_hlsl_header(
+				${d3d11HlslFile} ${shader} "ps_4_0_level_9_1" ${d3d11Renderer})
+	endforeach()
+
+else()
+	ignore_hlsl(${d3d11HlslFile})
+endif()

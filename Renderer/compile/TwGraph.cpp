@@ -4,12 +4,9 @@
 
 #include "TwOpenGL.h"
 #include "TwOpenGLCore.h"
-
-#ifdef ANT_WINDOWS
 #include "TwDirect3D9.h"
 #include "TwDirect3D10.h"
 #include "TwDirect3D11.h"
-#endif
 
 // Don't link anything - we just need an enum!
 #ifndef TW_STATIC
@@ -24,16 +21,26 @@ char const* ITwGraph::g_ErrorState = NULL;
 
 ITwGraph* ITwGraph::Create(IUnknown* _D3DDevice)
 {
+#if !defined ANT_TW_NO_CORE_GL
 	if ( _D3DDevice == NULL )
 		return CreateForAPI(TW_OPENGL_CORE);
-
-	void* dev;
+#elif !defined ANT_TW_NO_LEGACY_GL
+	if ( _D3DDevice == NULL )
+		return CreateForAPI(TW_OPENGL_CORE);
+#endif
+	void* dev = NULL;
+#if !defined ANT_TW_NO_D3D11
 	dev = CTwGraphDirect3D11::DetectDevice(_D3DDevice);
 	if (dev != NULL) return CreateForAPI(TW_DIRECT3D11, dev);
+#endif
+#if !defined ANT_TW_NO_D3D10
 	dev = CTwGraphDirect3D10::DetectDevice(_D3DDevice);
 	if (dev != NULL) return CreateForAPI(TW_DIRECT3D10, dev);
+#endif
+#if !defined ANT_TW_NO_D3D9
 	dev = CTwGraphDirect3D9::DetectDevice(_D3DDevice);
 	if (dev != NULL) return CreateForAPI(TW_DIRECT3D9, dev);
+#endif
 	return CreateForAPI(-1, NULL); // invalid & raises an error
 }
 
@@ -44,21 +51,29 @@ ITwGraph* ITwGraph::CreateForAPI(int _GraphAPI, void* _D3DDevice)
 
     switch( _GraphAPI )
     {
+#if !defined ANT_TW_NO_LEGACY_GL
     case TW_OPENGL:
         result = new CTwGraphOpenGL;
         break;
+#endif
+#if !defined ANT_TW_NO_CORE_GL
     case TW_OPENGL_CORE:
         result = new CTwGraphOpenGLCore;
         break;
-#ifdef ANT_WINDOWS
+#endif
+#if !defined ANT_TW_NO_D3D9
     case TW_DIRECT3D9:
         result = new CTwGraphDirect3D9( _D3DDevice );
         break;
+#endif
+#if !defined ANT_TW_NO_D3D10
     case TW_DIRECT3D10:
         result = new CTwGraphDirect3D10( _D3DDevice );
         break;
+#endif
+#if !defined ANT_TW_NO_D3D11
     case TW_DIRECT3D11:
-        result = new CTwGraphDirect3D10( _D3DDevice );
+        result = new CTwGraphDirect3D11( _D3DDevice );
         break;
 #endif
     default:

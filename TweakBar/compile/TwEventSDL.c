@@ -14,11 +14,20 @@
 //
 //  ---------------------------------------------------------------------------
 
+
 #include <AntTweakBar.h>
 
+#if !defined TW_NO_SDL12_EVENTS
 int TW_CALL TwEventSDL12(const void *sdlEvent); // implemented in TwEventSDL12.c
+#endif
+#if !defined TW_NO_SDL13_EVENTS
 int TW_CALL TwEventSDL13(const void *sdlEvent); // implmeneted in TwEventSDL13.c
+#endif
+#if !defined TW_NO_SDL20_EVENTS
 int TW_CALL TwEventSDL20(const void *sdlEvent); // implemented in TwEventSDL20.c
+#endif
+
+#if !(defined TW_NO_SDL12_EVENTS && defined TW_NO_SDL13_EVENTS && defined TW_NO_SDL20_EVENTS)
 
 #ifdef  __cplusplus
     extern "C" { int TW_CALL TwSetLastError(const char *staticErrorMessage); }
@@ -32,16 +41,25 @@ int TW_CALL TwEventSDL20(const void *sdlEvent); // implemented in TwEventSDL20.c
 //  AntTweakBar library.
 int TW_CALL TwEventSDL(const void *sdlEvent, unsigned char majorVersion, unsigned char minorVersion)
 {
-    if (majorVersion < 1 || (majorVersion == 1 && minorVersion < 2))
+#if !defined TW_NO_SDL12_EVENTS
+    if( majorVersion == 1 && minorVersion == 2 )
+        return TwEventSDL12(sdlEvent);
+#endif
+#if !defined TW_NO_SDL13_EVENTS
+    if( majorVersion==1 && minorVersion == 3 )
+        return TwEventSDL13(sdlEvent);
+#endif
+#if !defined TW_NO_SDL20_EVENTS
+    if ( majorVersion < 1 || (majorVersion == 1 && minorVersion <= 3) )
     {
+#endif
         static const char *g_ErrBadSDLVersion = "Unsupported SDL version";
         TwSetLastError(g_ErrBadSDLVersion);
         return 0;
+#if !defined TW_NO_SDL20_EVENTS
     }
-    else if (majorVersion == 1 && minorVersion == 2)
-        return TwEventSDL12(sdlEvent);
-    else if( majorVersion==1 && minorVersion==3 )
-        return TwEventSDL13(sdlEvent);
-    else
-        return TwEventSDL20(sdlEvent);
+    return TwEventSDL20(sdlEvent);
+#endif
 }
+
+#endif

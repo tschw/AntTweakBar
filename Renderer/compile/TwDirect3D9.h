@@ -14,6 +14,8 @@
 #if !defined ANT_TW_DIRECT3D9_INCLUDED
 #define ANT_TW_DIRECT3D9_INCLUDED
 
+#if !defined ANT_TW_NO_D3D9
+
 #include "TwGraph.h"
 
 //  ---------------------------------------------------------------------------
@@ -89,5 +91,5 @@ protected:
 
 //  ---------------------------------------------------------------------------
 
-
+#endif // !defined ANT_TW_NO_D3D9
 #endif // !defined ANT_TW_DIRECT3D9_INCLUDED

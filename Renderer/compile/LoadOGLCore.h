@@ -370,7 +370,9 @@ ANT_GL_CORE_DECL_NO_FORWARD(GLboolean, glIsVertexArray, (GLuint array))
 #ifdef ANT_WINDOWS
 ANT_GL_CORE_DECL(PROC, wglGetProcAddress, (LPCSTR))
 #endif                                                                                                                                                                                                                                                                                                                                                
-
+#ifndef GL_VERSION
+#   define GL_VERSION           0x1F02
+#endif
 #ifndef GL_CLAMP_TO_EDGE
 #   define GL_CLAMP_TO_EDGE     0x812F
 #endif
@@ -410,6 +412,5 @@ ANT_GL_CORE_DECL(PROC, wglGetProcAddress, (LPCSTR))
 #ifndef GL_BGRA
 #   define GL_BGRA              0x80E1
 #endif
-
 
 #endif // !defined ANT_LOAD_OGL_CORE_INCLUDED

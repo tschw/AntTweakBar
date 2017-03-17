@@ -11,6 +11,8 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_X11_EVENTS
+
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
@@ -204,4 +206,6 @@ TW_API int TW_CDECL_CALL TwEventX11(void *xevent)
     }
     return 0;
 }
+
+#endif // !defined TW_NO_X11_EVENTS
         

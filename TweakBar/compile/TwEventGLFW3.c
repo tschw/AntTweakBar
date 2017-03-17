@@ -11,6 +11,8 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined TW_NO_GLFW3_EVENTS
+
 #include "MiniGLFW3.h" // a subset of GLFW3.h needed to compile TwEventGLFW3.c
 // note: AntTweakBar.dll does not need to link with GLFW,
 // it just needs some definitions for its helper functions.
@@ -193,3 +195,5 @@ TW_API int TW_CDECL_CALL TwEventScrollGLFW3cdecl(GLFWwindow *window, double xoff
 {
     return TwEventScrollGLFW3(window, xoffset, yoffset);
 }
+
+#endif // !defined TW_NO_GLFW3_EVENTS

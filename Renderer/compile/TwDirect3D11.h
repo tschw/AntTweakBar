@@ -10,9 +10,10 @@
 //
 //  ---------------------------------------------------------------------------
 
-
 #if !defined ANT_TW_DIRECT3D11_INCLUDED
 #define ANT_TW_DIRECT3D11_INCLUDED
+
+#if !defined ANT_TW_NO_D3D11
 
 #include "TwGraph.h"
 
@@ -117,5 +118,5 @@ protected:
 
 //  ---------------------------------------------------------------------------
 
-
+#endif // !defined ANT_TW_NO_D3D11
 #endif // !defined ANT_TW_DIRECT3D11_INCLUDED

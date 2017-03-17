@@ -14,6 +14,8 @@
 #if !defined ANT_TW_OPENGL_INCLUDED
 #define ANT_TW_OPENGL_INCLUDED
 
+#if !defined ANT_TW_NO_LEGACY_GL
+
 #include "TwPrecomp.h"
 #include "TwGraph.h"
 
@@ -95,5 +97,5 @@ protected:
 
 //  ---------------------------------------------------------------------------
 
-
+#endif // !defined ANT_TW_NO_LEGACY_GL
 #endif // !defined ANT_TW_OPENGL_INCLUDED

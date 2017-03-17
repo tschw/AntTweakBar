@@ -7,6 +7,7 @@
 //
 //  ---------------------------------------------------------------------------
 
+#if !defined ANT_TW_NO_D3D10
 
 #include "TwPrecomp.h"
 #include "TwDirect3D10.h"
@@ -1289,3 +1290,5 @@ void CTwGraphDirect3D10::DrawTriangles(int _NumTriangles, int *_Vertices, color3
 }
 
 //  ---------------------------------------------------------------------------
+
+#endif // !defined ANT_TW_NO_D3D10
