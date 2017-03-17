@@ -14,8 +14,6 @@
 #if !defined ANT_TW_FONTS_INCLUDED
 #define ANT_TW_FONTS_INCLUDED
 
-//#include <AntTweakBar.h>
-
 /*
 A source bitmap includes 224 characters starting from ascii char 32 (i.e. space) 
 to ascii char 255 (extended ASCII Latin1/CP1252):
@@ -52,7 +50,7 @@ struct CTexFont
 };
 
 
-CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeight, float _Scaling=1.0f);
+CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeight, float _Scaling=1.0f, bool _forD3D=false);
 
 
 extern CTexFont *g_DefaultSmallFont;
@@ -61,7 +59,7 @@ extern CTexFont *g_DefaultLargeFont;
 extern CTexFont *g_DefaultFixed1Font;
 extern CTexFont *g_DefaultFixedRuFont;
 
-void TwGenerateDefaultFonts(float _Scaling=1.0f);
+void TwGenerateDefaultFonts(float _Scaling=1.0f, bool _forD3D=false);
 void TwDeleteDefaultFonts();
 
 

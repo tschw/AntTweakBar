@@ -10,7 +10,6 @@
 
 #include "TwPrecomp.h"
 #include "TwDirect3D10.h"
-#include "TwMgr.h"
 #include "TwColors.h"
 
 #include "d3d10vs2003.h" // Workaround to include D3D10.h with VS2003
@@ -239,12 +238,9 @@ char g_ShaderFX[] = "// AntTweakBar shaders and techniques \n"
 
 //  ---------------------------------------------------------------------------
 
-int CTwGraphDirect3D10::Init()
+CTwGraphDirect3D10::CTwGraphDirect3D10(void* _D3DDevice)
 {
-    assert(g_TwMgr!=NULL);
-    assert(g_TwMgr->m_Device!=NULL);
-
-    m_D3DDev = static_cast<ID3D10Device *>(g_TwMgr->m_Device);
+    m_D3DDev = static_cast<ID3D10Device *>(_D3DDevice);
     m_D3DDevInitialRefCount = m_D3DDev->AddRef() - 1;
 
     m_Drawing = false;
@@ -275,12 +271,14 @@ int CTwGraphDirect3D10::Init()
     m_FontD3DResVar = NULL;
     m_OffsetVar = NULL;
     m_CstColorVar = NULL;
+}
 
+int CTwGraphDirect3D10::Init()
+{
     // Load some D3D10 functions
     if( !LoadDirect3D10() )
     {
-        g_TwMgr->SetLastError(g_ErrCantLoadD3D10);
-        Shut();
+        g_ErrorState = g_ErrCantLoadD3D10;
         return 0;
     }
 
@@ -298,7 +296,7 @@ int CTwGraphDirect3D10::Init()
     if( FAILED(hr) )
     {
         const size_t ERR_MSG_MAX_LEN = 4096;
-        static char s_ErrorMsg[ERR_MSG_MAX_LEN]; // must be static to be sent to SetLastError
+        static char s_ErrorMsg[ERR_MSG_MAX_LEN]; // must be static - no free
         strncpy(s_ErrorMsg, g_ErrCompileFX10, ERR_MSG_MAX_LEN-1);
         size_t errOffset = strlen(s_ErrorMsg);
         size_t errLen = 0;
@@ -312,16 +310,14 @@ int CTwGraphDirect3D10::Init()
             errors = NULL;
         }
         s_ErrorMsg[errOffset+errLen] = '\0';
-        g_TwMgr->SetLastError(s_ErrorMsg);
-        Shut();
+        g_ErrorState = s_ErrorMsg;
         return 0;
     }
     hr = _D3D10CreateEffectFromMemory(compiledFX->GetBufferPointer(), compiledFX->GetBufferSize(), 0, m_D3DDev, NULL, &m_Effect);
     compiledFX->Release();
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateFX10);
-        Shut();
+        g_ErrorState = g_ErrCreateFX10;
         return 0;
     }
 
@@ -332,8 +328,7 @@ int CTwGraphDirect3D10::Init()
     m_TextCstColorTech = m_Effect->GetTechniqueByName("TextCstColor");
     if( m_LineRectTech==NULL || m_TextTech==NULL || m_LineRectCstColorTech==NULL || m_TextCstColorTech==NULL )
     {
-        g_TwMgr->SetLastError(g_ErrTechNotFound10);
-        Shut();
+        g_ErrorState = g_ErrTechNotFound10;
         return 0;
     }
  
@@ -349,8 +344,7 @@ int CTwGraphDirect3D10::Init()
         hr = m_D3DDev->CreateInputLayout(lineRectLayout, sizeof(lineRectLayout)/sizeof(lineRectLayout[0]), passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &m_LineRectVertexLayout);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateLayout10);
-        Shut();
+        g_ErrorState = g_ErrCreateLayout10;
         return 0;
     }
 
@@ -364,8 +358,7 @@ int CTwGraphDirect3D10::Init()
     hr = m_D3DDev->CreateBuffer(&bd, NULL, &m_LineVertexBuffer);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateBuffer10);
-        Shut();
+        g_ErrorState = g_ErrCreateBuffer10;
         return 0;
     }
 
@@ -374,8 +367,7 @@ int CTwGraphDirect3D10::Init()
     hr = m_D3DDev->CreateBuffer(&bd, NULL, &m_RectVertexBuffer);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateBuffer10);
-        Shut();
+        g_ErrorState = g_ErrCreateBuffer10;
         return 0;
     }
 
@@ -391,8 +383,7 @@ int CTwGraphDirect3D10::Init()
         hr = m_D3DDev->CreateInputLayout(textLayout, sizeof(textLayout)/sizeof(textLayout[0]), passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &m_TextVertexLayout);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateLayout10);
-        Shut();
+        g_ErrorState = g_ErrCreateLayout10;
         return 0;
     }
 
@@ -1133,7 +1124,7 @@ void CTwGraphDirect3D10::ChangeViewport(int _X0, int _Y0, int _Width, int _Heigh
 {
     if( _Width>0 && _Height>0 )
     {
-	    /* viewport changes screen coordinates, use scissor instead
+        /* viewport changes screen coordinates, use scissor instead
         D3D10_VIEWPORT vp;
         vp.TopLeftX = _X0;
         vp.TopLeftY = _Y0;
@@ -1202,8 +1193,8 @@ void CTwGraphDirect3D10::DrawTriangles(int _NumTriangles, int *_Vertices, color3
 
     if( m_TrianglesVertexBufferCount<3*_NumTriangles ) // force re-creation
     {
-	    if( m_TrianglesVertexBuffer!=NULL )
-	        m_TrianglesVertexBuffer->Release();
+        if( m_TrianglesVertexBuffer!=NULL )
+            m_TrianglesVertexBuffer->Release();
         m_TrianglesVertexBuffer = NULL;
         m_TrianglesVertexBufferCount = 0;
     }

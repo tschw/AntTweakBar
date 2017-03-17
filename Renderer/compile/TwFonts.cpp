@@ -9,7 +9,6 @@
 
 
 #include "TwPrecomp.h"
-#include "TwMgr.h"
 #include "TwFonts.h"
 
 // Fedora patch: memset()
@@ -60,7 +59,7 @@ static int NextPow2(int _n)
 
 const char *g_ErrBadFontHeight = "Cannot determine font height while reading font bitmap (check first pixel column)";
 
-CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeight, float _Scaling)
+CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeight, float _Scaling, bool _forD3D)
 {
     // find height of the font
     int x, y;
@@ -71,7 +70,6 @@ CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeig
         {
             if( (hh<=0 && h<=0) || (h!=hh && h>0 && hh>0) )
             {
-                g_TwMgr->SetLastError(g_ErrBadFontHeight);
                 return NULL;
             }
             else if( h<=0 )
@@ -141,21 +139,12 @@ CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeig
     TexFont->m_TexBytes = new unsigned char[TexFont->m_TexWidth*TexFont->m_TexHeight];
     memset(TexFont->m_TexBytes, 0, TexFont->m_TexWidth*TexFont->m_TexHeight);
     int xx;
-    float du = 0.4f;
-    float dv = 0.4f;
-    assert( g_TwMgr!=NULL );
-    if( g_TwMgr )
+    float du = 0.0f;
+    float dv = 0.0f;
+    if( _forD3D ) // texel alignement for D3D
     {
-        if( g_TwMgr->m_GraphAPI==TW_OPENGL || g_TwMgr->m_GraphAPI==TW_OPENGL_CORE )
-        {
-            du = 0;
-            dv = 0;
-        }
-        else    // texel alignement for D3D
-        {
-            du = 0.5f;
-            dv = 0.5f;
-        }
+        du = 0.5f;
+        dv = 0.5f;
     }
     float alpha;
     for( r=0; r<14; ++r )
@@ -4871,17 +4860,17 @@ static const unsigned char s_FontFixed1[] = {
 
 #include "res/RuFont.txt"
 
-void TwGenerateDefaultFonts(float _Scaling)
+void TwGenerateDefaultFonts(float _Scaling, bool _forD3D)
 {
-    g_DefaultSmallFont = TwGenerateFont(s_Font0, FONT0_BM_W, FONT0_BM_H, _Scaling);
+    g_DefaultSmallFont = TwGenerateFont(s_Font0, FONT0_BM_W, FONT0_BM_H, _Scaling, _forD3D);
     assert(g_DefaultSmallFont && g_DefaultSmallFont->m_NbCharRead==224);
-    g_DefaultNormalFont = TwGenerateFont(s_Font1AA, FONT1AA_BM_W, FONT1AA_BM_H, _Scaling);
+    g_DefaultNormalFont = TwGenerateFont(s_Font1AA, FONT1AA_BM_W, FONT1AA_BM_H, _Scaling, _forD3D);
     assert(g_DefaultNormalFont && g_DefaultNormalFont->m_NbCharRead==224);
-    g_DefaultLargeFont = TwGenerateFont(s_Font2AA, FONT2AA_BM_W, FONT2AA_BM_H, _Scaling);
+    g_DefaultLargeFont = TwGenerateFont(s_Font2AA, FONT2AA_BM_W, FONT2AA_BM_H, _Scaling, _forD3D);
     assert(g_DefaultLargeFont && g_DefaultLargeFont->m_NbCharRead==224);
-    g_DefaultFixed1Font = TwGenerateFont(s_FontFixed1, FONTFIXED1_BM_W, FONTFIXED1_BM_H, _Scaling);
+    g_DefaultFixed1Font = TwGenerateFont(s_FontFixed1, FONTFIXED1_BM_W, FONTFIXED1_BM_H, _Scaling, _forD3D);
     assert(g_DefaultFixed1Font && g_DefaultFixed1Font->m_NbCharRead==224);
-    g_DefaultFixedRuFont = TwGenerateFont(s_FontFixedRU, FONTFIXEDRU_BM_W, FONTFIXEDRU_BM_H, _Scaling);
+    g_DefaultFixedRuFont = TwGenerateFont(s_FontFixedRU, FONTFIXEDRU_BM_W, FONTFIXEDRU_BM_H, _Scaling, _forD3D);
     assert(g_DefaultFixedRuFont && g_DefaultFixedRuFont->m_NbCharRead==224);
 }
 

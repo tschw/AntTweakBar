@@ -10,7 +10,6 @@
 
 #include "TwPrecomp.h"
 #include "TwDirect3D11.h"
-#include "TwMgr.h"
 #include "TwColors.h"
 
 #include "d3d10vs2003.h" // Workaround to include D3D10.h and D3D11.h with VS2003
@@ -32,39 +31,12 @@ const char *g_ErrCreateSampler11 = "Direct3D11 sampler state creation failed";
 //  vertex and pixel shaders are compiled offline in a pre-build step using
 //  the fxc.exe compiler (from the DirectX SDK Aug'09 or later)
 
-#ifdef _WIN64
-#   ifdef _DEBUG
-#       include "debug64\TwDirect3D11_LineRectVS.h"
-#       include "debug64\TwDirect3D11_LineRectCstColorVS.h"
-#       include "debug64\TwDirect3D11_LineRectPS.h"
-#       include "debug64\TwDirect3D11_TextVS.h"
-#       include "debug64\TwDirect3D11_TextCstColorVS.h"
-#       include "debug64\TwDirect3D11_TextPS.h"
-#   else
-#       include "release64\TwDirect3D11_LineRectVS.h"
-#       include "release64\TwDirect3D11_LineRectCstColorVS.h"
-#       include "release64\TwDirect3D11_LineRectPS.h"
-#       include "release64\TwDirect3D11_TextVS.h"
-#       include "release64\TwDirect3D11_TextCstColorVS.h"
-#       include "release64\TwDirect3D11_TextPS.h"
-#   endif
-#else
-#   ifdef _DEBUG
-#       include "debug32\TwDirect3D11_LineRectVS.h"
-#       include "debug32\TwDirect3D11_LineRectCstColorVS.h"
-#       include "debug32\TwDirect3D11_LineRectPS.h"
-#       include "debug32\TwDirect3D11_TextVS.h"
-#       include "debug32\TwDirect3D11_TextCstColorVS.h"
-#       include "debug32\TwDirect3D11_TextPS.h"
-#   else
-#       include "release32\TwDirect3D11_LineRectVS.h"
-#       include "release32\TwDirect3D11_LineRectCstColorVS.h"
-#       include "release32\TwDirect3D11_LineRectPS.h"
-#       include "release32\TwDirect3D11_TextVS.h"
-#       include "release32\TwDirect3D11_TextCstColorVS.h"
-#       include "release32\TwDirect3D11_TextPS.h"
-#   endif
-#endif
+#include "TwDirect3D11_LineRectVS.h"
+#include "TwDirect3D11_LineRectCstColorVS.h"
+#include "TwDirect3D11_LineRectPS.h"
+#include "TwDirect3D11_TextVS.h"
+#include "TwDirect3D11_TextCstColorVS.h"
+#include "TwDirect3D11_TextPS.h"
 
 //  ---------------------------------------------------------------------------
 
@@ -504,12 +476,9 @@ void CState11::Release()
 
 //  ---------------------------------------------------------------------------
 
-int CTwGraphDirect3D11::Init()
+CTwGraphDirect3D11::CTwGraphDirect3D11(void* _D3DDevice)
 {
-    assert(g_TwMgr!=NULL);
-    assert(g_TwMgr->m_Device!=NULL);
-
-    m_D3DDev = static_cast<ID3D11Device *>(g_TwMgr->m_Device);
+    m_D3DDev = static_cast<ID3D11Device *>(_D3DDevice);
     m_D3DDevInitialRefCount = m_D3DDev->AddRef() - 1;
     m_D3DDev->GetImmediateContext(&m_D3DDevImmContext);
 
@@ -543,7 +512,12 @@ int CTwGraphDirect3D11::Init()
     m_TrianglesVertexBufferCount = 0;
     m_ConstantBuffer = NULL;
     m_SamplerState = NULL;
+}
 
+//  ---------------------------------------------------------------------------
+
+int CTwGraphDirect3D11::Init()
+{
     // Allocate state object
     m_State = new CState11(m_D3DDev, m_D3DDevImmContext);
 
@@ -559,43 +533,37 @@ int CTwGraphDirect3D11::Init()
     HRESULT hr = m_D3DDev->CreateVertexShader(g_LineRectVS, sizeof(g_LineRectVS), NULL, &m_LineRectVS);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateVS11);
-        Shut();
+        g_ErrorState = g_ErrCreateVS11;
         return 0;
     }
     hr = m_D3DDev->CreateVertexShader(g_LineRectCstColorVS, sizeof(g_LineRectCstColorVS), NULL, &m_LineRectCstColorVS);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateVS11);
-        Shut();
+        g_ErrorState = g_ErrCreateVS11;
         return 0;
     }
     hr = m_D3DDev->CreatePixelShader(g_LineRectPS, sizeof(g_LineRectPS), NULL, &m_LineRectPS);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreatePS11);
-        Shut();
+        g_ErrorState = g_ErrCreatePS11;
         return 0;
     }
     hr = m_D3DDev->CreateVertexShader(g_TextVS, sizeof(g_TextVS), NULL, &m_TextVS);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateVS11);
-        Shut();
+        g_ErrorState = g_ErrCreateVS11;
         return 0;
     }
     hr = m_D3DDev->CreateVertexShader(g_TextCstColorVS, sizeof(g_TextCstColorVS), NULL, &m_TextCstColorVS);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateVS11);
-        Shut();
+        g_ErrorState = g_ErrCreateVS11;
         return 0;
     }
     hr = m_D3DDev->CreatePixelShader(g_TextPS, sizeof(g_TextPS), NULL, &m_TextPS);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreatePS11);
-        Shut();
+        g_ErrorState = g_ErrCreatePS11;
         return 0;
     }
  
@@ -608,8 +576,7 @@ int CTwGraphDirect3D11::Init()
     hr = m_D3DDev->CreateInputLayout(lineRectLayout, sizeof(lineRectLayout)/sizeof(lineRectLayout[0]), g_LineRectVS, sizeof(g_LineRectVS), &m_LineRectVertexLayout);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateLayout11);
-        Shut();
+        g_ErrorState = g_ErrCreateLayout11;
         return 0;
     }
 
@@ -624,8 +591,7 @@ int CTwGraphDirect3D11::Init()
     hr = m_D3DDev->CreateBuffer(&bd, NULL, &m_LineVertexBuffer);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateBuffer11);
-        Shut();
+        g_ErrorState = g_ErrCreateBuffer11;
         return 0;
     }
 
@@ -634,8 +600,7 @@ int CTwGraphDirect3D11::Init()
     hr = m_D3DDev->CreateBuffer(&bd, NULL, &m_RectVertexBuffer);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateBuffer11);
-        Shut();
+        g_ErrorState = g_ErrCreateBuffer11;
         return 0;
     }
 
@@ -645,8 +610,7 @@ int CTwGraphDirect3D11::Init()
     hr = m_D3DDev->CreateBuffer(&bd, NULL, &m_ConstantBuffer);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateBuffer11);
-        Shut();
+        g_ErrorState = g_ErrCreateBuffer11;
         return 0;
     }
 
@@ -662,8 +626,7 @@ int CTwGraphDirect3D11::Init()
     hr = m_D3DDev->CreateSamplerState(&sd, &m_SamplerState);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateSampler11);
-        Shut();
+        g_ErrorState = g_ErrCreateSampler11;
         return 0;
     }
 
@@ -677,8 +640,7 @@ int CTwGraphDirect3D11::Init()
     hr = m_D3DDev->CreateInputLayout(textLayout, sizeof(textLayout)/sizeof(textLayout[0]), g_TextVS, sizeof(g_TextVS), &m_TextVertexLayout);
     if( FAILED(hr) )
     {
-        g_TwMgr->SetLastError(g_ErrCreateLayout11);
-        Shut();
+        g_ErrorState = g_ErrCreateLayout11;
         return 0;
     }
 

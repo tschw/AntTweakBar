@@ -6,8 +6,6 @@
 //  @license    This file is part of the AntTweakBar library.
 //              For conditions of distribution and use, see License.txt
 //
-//  note:       Private header
-//
 //  ---------------------------------------------------------------------------
 
 
@@ -17,6 +15,18 @@
 #include "TwColors.h"
 #include "TwFonts.h"
 
+#include <string>
+
+//  ---------------------------------------------------------------------------
+
+typedef enum ETwGraphAPI
+{
+    TW_OPENGL           = 1,
+    TW_DIRECT3D9        = 2,
+    TW_DIRECT3D10       = 3,
+    TW_DIRECT3D11       = 4,
+    TW_OPENGL_CORE      = 5
+} TwGraphAPI;
 
 //  ---------------------------------------------------------------------------
 
@@ -27,8 +37,13 @@
 class ITwGraph
 {
 public:
-    virtual int         Init() = 0;
-    virtual int         Shut() = 0;
+
+    static ITwGraph*    Create(ETwGraphAPI _GraphAPI, void* d3dDevice = 0l);
+	static bool			Delete(ITwGraph*);
+
+    static const char*  GetErrorState();
+
+
     virtual void        BeginDraw(int _WndWidth, int _WndHeight) = 0;
     virtual void        EndDraw() = 0;
     virtual bool        IsDrawing() = 0;
@@ -50,7 +65,15 @@ public:
     virtual void        RestoreViewport() = 0;
     virtual void        SetScissor(int _X0, int _Y0, int _Width, int _Height) = 0;
 
-    virtual             ~ITwGraph() {}  // required by gcc
+protected:
+
+    ITwGraph() { }
+    virtual             ~ITwGraph();
+
+    virtual int         Init() = 0;
+    virtual int         Shut() = 0;
+
+    static char const*  g_ErrorState;
 };
 
 //  ---------------------------------------------------------------------------

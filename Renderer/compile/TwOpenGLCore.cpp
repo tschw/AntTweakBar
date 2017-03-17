@@ -21,12 +21,11 @@
 #include "TwPrecomp.h"
 #include "LoadOGLCore.h"
 #include "TwOpenGLCore.h"
-#include "TwMgr.h"
 
 using namespace std;
 
-extern const char *g_ErrCantLoadOGL;
-extern const char *g_ErrCantUnloadOGL;
+static const char *g_ErrCantLoadOGL    = "Cannot load OpenGL library dynamically";
+static const char *g_ErrCantUnloadOGL  = "Cannot unload OpenGL library";
 
 //  ---------------------------------------------------------------------------
 
@@ -164,7 +163,7 @@ int CTwGraphOpenGLCore::Init()
 
     if( LoadOpenGLCore()==0 )
     {
-        g_TwMgr->SetLastError(g_ErrCantLoadOGL);
+        g_ErrorState = g_ErrCantLoadOGL;
         return 0;
     }
 
@@ -384,7 +383,7 @@ int CTwGraphOpenGLCore::Shut()
     int Res = 1;
     if( UnloadOpenGLCore()==0 )
     {
-        g_TwMgr->SetLastError(g_ErrCantUnloadOGL);
+        g_ErrorState = g_ErrCantUnloadOGL;
         Res = 0;
     }
 

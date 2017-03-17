@@ -10,7 +10,6 @@
 
 #include "TwPrecomp.h"
 #include "TwDirect3D9.h"
-#include "TwMgr.h"
 
 #include <d3d9.h>
 #ifdef _DEBUG
@@ -119,20 +118,25 @@ void CState::Restore()
 
 //  ---------------------------------------------------------------------------
 
+CTwGraphDirect3D9::CTwGraphDirect3D9(void* _D3DDevice)
+{
+	m_D3DDev = static_cast<IDirect3DDevice9 *>(_D3DDevice);
+	m_Drawing = false;
+	m_FontTex = NULL;
+	m_FontD3DTex = NULL;
+	m_State = NULL;
+	m_ViewportInit = NULL;
+}
+
 int CTwGraphDirect3D9::Init()
 {
-    assert(g_TwMgr->m_Device!=NULL);
-
-    m_D3DDev = static_cast<IDirect3DDevice9 *>(g_TwMgr->m_Device);
-    m_Drawing = false;
-    m_FontTex = NULL;
-    m_FontD3DTex = NULL;
-    D3DDEVICE_CREATION_PARAMETERS cp;
+	D3DDEVICE_CREATION_PARAMETERS cp;
     m_D3DDev->GetCreationParameters(&cp);
     m_PureDevice = ( cp.BehaviorFlags & D3DCREATE_PUREDEVICE ) ? true : false;
     m_WndWidth = 0;
     m_WndHeight = 0;
-    m_State = new CState(m_D3DDev);
+
+	m_State = new CState(m_D3DDev);
     m_ViewportInit = new D3DVIEWPORT9;
     ZeroMemory(m_ViewportInit, sizeof(D3DVIEWPORT9));
     m_OffsetX = 0;

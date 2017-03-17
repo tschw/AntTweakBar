@@ -14,6 +14,7 @@
 #if !defined ANT_TW_OPENGL_INCLUDED
 #define ANT_TW_OPENGL_INCLUDED
 
+#include "TwPrecomp.h"
 #include "TwGraph.h"
 
 //  ---------------------------------------------------------------------------

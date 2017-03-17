@@ -11,12 +11,11 @@
 #include "TwPrecomp.h"
 #include "LoadOGL.h"
 #include "TwOpenGL.h"
-#include "TwMgr.h"
 
 using namespace std;
 
-const char *g_ErrCantLoadOGL    = "Cannot load OpenGL library dynamically";
-const char *g_ErrCantUnloadOGL  = "Cannot unload OpenGL library";
+static const char *g_ErrCantLoadOGL    = "Cannot load legacy OpenGL library dynamically";
+static const char *g_ErrCantUnloadOGL  = "Cannot unload legacy OpenGL library";
 
 GLuint g_SmallFontTexID = 0;
 GLuint g_NormalFontTexID = 0;
@@ -204,7 +203,7 @@ int CTwGraphOpenGL::Init()
 
     if( LoadOpenGL()==0 )
     {
-        g_TwMgr->SetLastError(g_ErrCantLoadOGL);
+        g_ErrorState = g_ErrCantLoadOGL;
         return 0;
     }
 
@@ -240,7 +239,7 @@ int CTwGraphOpenGL::Shut()
     int Res = 1;
     if( UnloadOpenGL()==0 )
     {
-        g_TwMgr->SetLastError(g_ErrCantUnloadOGL);
+        g_ErrorState = g_ErrCantUnloadOGL;
         Res = 0;
     }
 

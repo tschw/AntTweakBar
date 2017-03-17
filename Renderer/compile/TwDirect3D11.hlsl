@@ -24,7 +24,7 @@ LineRectPSInput LineRectVS(float4 pos : POSITION, float4 color : COLOR)
     LineRectPSInput ps; 
     ps.Pos = pos + g_Offset;
     ps.Color = color; 
-    return ps; 
+    return ps;
 }
 
 LineRectPSInput LineRectCstColorVS(float4 pos : POSITION, float4 color : COLOR) 

@@ -21,6 +21,8 @@
 class CTwGraphDirect3D9 : public ITwGraph
 {
 public:
+	explicit CTwGraphDirect3D9(void* _D3DDevice);
+
     virtual int                 Init();
     virtual int                 Shut();
     virtual void                BeginDraw(int _WndWidth, int _WndHeight);
