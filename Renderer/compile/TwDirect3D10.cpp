@@ -238,6 +238,15 @@ char g_ShaderFX[] = "// AntTweakBar shaders and techniques \n"
 
 //  ---------------------------------------------------------------------------
 
+void* CTwGraphDirect3D10::DetectDevice(IUnknown* dev)
+{
+    ID3D10Device* result = NULL;
+    static _GUID IID_ID3D10Device_local = {
+            0x9B7E4C0F, 0x342C, 0x4106, { 0xA1, 0x9F, 0x4F, 0x27, 0x04, 0xF6, 0x89, 0xF0 } };
+    dev->QueryInterface(IID_ID3D10Device_local, (void**)&result);
+    return result;
+}
+
 CTwGraphDirect3D10::CTwGraphDirect3D10(void* _D3DDevice)
 {
     m_D3DDev = static_cast<ID3D10Device *>(_D3DDevice);

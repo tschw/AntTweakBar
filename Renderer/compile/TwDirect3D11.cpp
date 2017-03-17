@@ -16,7 +16,6 @@
 #define D3D11_IGNORE_SDK_LAYERS // d3d11sdklayers.h may not exist
 #include <d3d11.h>
 
-
 using namespace std;
 
 const char *g_ErrCantLoadD3D11   = "Cannot load Direct3D11 library dynamically";
@@ -475,6 +474,15 @@ void CState11::Release()
 }
 
 //  ---------------------------------------------------------------------------
+
+void* CTwGraphDirect3D11::DetectDevice(IUnknown* dev)
+{
+    ID3D11Device* result = NULL;
+    static _GUID IID_ID3D11Device_local = {
+            0xdb6f6ddb, 0xac77, 0x4e88,{ 0x82, 0x53, 0x81, 0x9d, 0xf9, 0xbb, 0xf1, 0x40 } };
+    dev->QueryInterface(IID_ID3D11Device_local, (void**)&result);
+    return result;
+}
 
 CTwGraphDirect3D11::CTwGraphDirect3D11(void* _D3DDevice)
 {

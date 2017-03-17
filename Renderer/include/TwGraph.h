@@ -23,9 +23,14 @@
 #   undef DrawText
 #endif  // DrawText
 
+struct IUnknown;
+
 class ITwGraph
 {
 public:
+	// Create instance, if a D3D device is given, autodetect its version,
+	// otherwise use OpenGL (core profile is preferred)
+    static ITwGraph*    Create(IUnknown* _D3DDevice = 0l);
 
 	static ITwGraph*	CreateForAPI(int, void* = 0l); //  TwInit signature
 

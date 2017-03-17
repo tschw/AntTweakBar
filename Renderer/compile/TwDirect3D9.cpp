@@ -17,7 +17,6 @@
 //  #pragma comment(lib, "dxerr9")
 #endif // _DEBUG
 
-
 using namespace std;
 
 const char *g_ErrCantLoadD3D9   = "Cannot load Direct3D9 library dynamically";
@@ -117,6 +116,15 @@ void CState::Restore()
 }
 
 //  ---------------------------------------------------------------------------
+
+void* CTwGraphDirect3D9::DetectDevice(IUnknown* dev)
+{
+    IDirect3DDevice9* result = NULL;
+    static _GUID IID_IDirect3DDevice9_local = {
+			0xd0223b96, 0xbf7a, 0x43fd, { 0x92, 0xbd, 0xa4, 0x3b, 0xd, 0x82, 0xb9, 0xeb } };
+    dev->QueryInterface(IID_IDirect3DDevice9_local, (void**) &result);
+    return result;
+}
 
 CTwGraphDirect3D9::CTwGraphDirect3D9(void* _D3DDevice)
 {

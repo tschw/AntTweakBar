@@ -23,6 +23,7 @@ class CTwGraphDirect3D11 : public ITwGraph
 public:
 
     explicit CTwGraphDirect3D11(void* _D3DDevice);
+    static void*                DetectDevice(IUnknown*);
 
     virtual int                 Init();
     virtual int                 Shut();

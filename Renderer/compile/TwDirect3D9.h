@@ -22,6 +22,7 @@ class CTwGraphDirect3D9 : public ITwGraph
 {
 public:
 	explicit CTwGraphDirect3D9(void* _D3DDevice);
+    static void*                DetectDevice(IUnknown*);
 
     virtual int                 Init();
     virtual int                 Shut();

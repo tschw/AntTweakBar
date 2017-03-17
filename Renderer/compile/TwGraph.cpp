@@ -22,6 +22,21 @@
 
 char const* ITwGraph::g_ErrorState = NULL;
 
+ITwGraph* ITwGraph::Create(IUnknown* _D3DDevice)
+{
+	if ( _D3DDevice == NULL )
+		return CreateForAPI(TW_OPENGL_CORE);
+
+	void* dev;
+	dev = CTwGraphDirect3D11::DetectDevice(_D3DDevice);
+	if (dev != NULL) return CreateForAPI(TW_DIRECT3D11, dev);
+	dev = CTwGraphDirect3D10::DetectDevice(_D3DDevice);
+	if (dev != NULL) return CreateForAPI(TW_DIRECT3D10, dev);
+	dev = CTwGraphDirect3D9::DetectDevice(_D3DDevice);
+	if (dev != NULL) return CreateForAPI(TW_DIRECT3D9, dev);
+	return CreateForAPI(-1, NULL); // invalid & raises an error
+}
+
 ITwGraph* ITwGraph::CreateForAPI(int _GraphAPI, void* _D3DDevice)
 {
     ITwGraph* result;
