@@ -37,7 +37,7 @@ set(sources
 ###############################################################################
 # Build setup
 
-add_library(ATB_GUIRenderer ${headers} ${sources})
+add_library(ATB_GUIRenderer STATIC ${headers} ${sources})
 
 
 find_program(ATB_D3D11_FXC fxc DOC "Direct3D 11 Shader Compiler")
