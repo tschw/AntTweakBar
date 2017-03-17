@@ -5476,6 +5476,16 @@ static int TwMouseEvent(ETwMouseAction _EventType, TwMouseButtonID _Button, int 
     if( g_TwMgr==NULL ) // Mgr might have been destroyed by the client inside a callback call
         return 1;
 
+    bool barExists = false;
+    for( i=((int)g_TwMgr->m_Bars.size())-1; i>=0; --i )
+        if( Bar==g_TwMgr->m_Bars[i] )
+        {
+            barExists = true;
+            break;
+        }
+
+    if( !barExists ) Bar = NULL;
+
     /*
     if( i>=0 && Bar!=NULL && Handled && (_EventType==TW_MOUSE_PRESSED || Bar->IsMinimized()) && i!=((int)g_TwMgr->m_Bars.size())-1 )
     {
@@ -5485,13 +5495,12 @@ static int TwMouseEvent(ETwMouseAction _EventType, TwMouseButtonID _Button, int 
         g_TwMgr->m_Order[(int)g_TwMgr->m_Bars.size()-1] = iOrder;
     }
     */
+
     if( _EventType==TW_MOUSE_PRESSED || (Bar!=NULL && Bar->IsMinimized() && Handled) )
     {
-        if( wasPopup && Bar!=g_TwMgr->m_PopupBar && g_TwMgr->m_PopupBar!=NULL ) // delete popup
-        {
+        if( wasPopup && Bar!=g_TwMgr->m_PopupBar && g_TwMgr->m_PopupBar!=NULL )
+			// Click onto something not the popup
             TwDeleteBar(g_TwMgr->m_PopupBar);
-            g_TwMgr->m_PopupBar = NULL;
-        }
 
         if( i>=0 && Bar!=NULL && Handled && !wasPopup )
             TwSetTopBar(Bar);
