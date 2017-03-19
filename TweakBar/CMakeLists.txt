@@ -1,7 +1,7 @@
 ###############################################################################
 # Configuration
 
-set(ATB_EVENT_HANDLER_WINDOWS	ON		CACHE BOOL
+set(ATB_EVENT_HANDLER_WINDOWS	WIN32	CACHE BOOL
 		"Provide an event handler interface for use with Windows")
 
 set(ATB_EVENT_HANDLER_X11		ON		CACHE BOOL
@@ -44,7 +44,7 @@ set(sources
 	"compile/TwMgr.h"
 
 	"compile/resource.h"
-	"compile/res/TwxCursors.h"
+	"compile/res/TwXCursors.h"
 	"compile/AntTweakBar.rc"
 
 	"compile/MiniGLFW.h"
@@ -91,6 +91,11 @@ set(defs TW_EXPORTS)
 
 if (NOT BUILD_SHARED_LIBS)
 	list(APPEND defs TW_STATIC)
+endif()
+
+if (UNIX AND NOT APPLE)
+	find_package(X11 REQUIRED)
+	target_link_libraries(AntTweakBar PRIVATE ${X11_LIBRARIES})
 endif()
 
 append_unless(defs	TW_NO_WINDOWS_EVENTS			ATB_EVENT_HANDLER_WINDOWS)
