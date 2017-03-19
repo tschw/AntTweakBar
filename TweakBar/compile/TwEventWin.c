@@ -12,7 +12,7 @@
 //
 //	---------------------------------------------------------------------------
 
-#if !defined TW_NO_WINDOWS_EVENT
+#if !defined TW_NO_WINDOWS_EVENTS
 
 #include <AntTweakBar.h>
 

@@ -86,6 +86,11 @@ target_include_directories(${target}
 		${CMAKE_CURRENT_BINARY_DIR}
 )
 
+if (NOT WIN32)
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(${target} ${OPENGL_LIBRARIES})
+endif()
+
 set(defs "")
 append_unless(defs	"ANT_TW_NO_CORE_GL"		ATB_GUIRENDERER_USE_CORE_GL)
 append_unless(defs	"ANT_TW_NO_LEGACY_GL"	ATB_GUIRENDERER_USE_LEGACY_GL)
