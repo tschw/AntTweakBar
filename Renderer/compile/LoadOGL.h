@@ -1,14 +1,14 @@
-//  ---------------------------------------------------------------------------
+//	---------------------------------------------------------------------------
 //
-//  @file       LoadOGL.h
-//  @brief      OpenGL declarations for dynamic loading
-//  @author     Philippe Decaudin
-//  @license    This file is part of the AntTweakBar library.
-//              For conditions of distribution and use, see License.txt
+//	@file		LoadOGL.h
+//	@brief		OpenGL declarations for dynamic loading
+//	@author		Philippe Decaudin
+//	@license	This file is part of the AntTweakBar library.
+//				For conditions of distribution and use, see License.txt
 //
-//  note:       Private header
+//	note:		Private header
 //
-//  ---------------------------------------------------------------------------
+//	---------------------------------------------------------------------------
 
 
 #if !defined ANT_LOAD_OGL_INCLUDED
@@ -16,19 +16,19 @@
 
 
 #define ANT_GL_DECL(_Ret, _Fct, _Params) \
-    extern "C" { typedef _Ret (APIENTRY* PFN##_Fct)_Params; } \
-    namespace GL { extern PFN##_Fct _##_Fct; } \
-    using GL::_##_Fct;
+	extern "C" { typedef _Ret (APIENTRY* PFN##_Fct)_Params; } \
+	namespace GL { extern PFN##_Fct _##_Fct; } \
+	using GL::_##_Fct;
 
 #if defined(ANT_WINDOWS)
-#   define ANT_GL_IMPL(_Fct) \
-        namespace GL { PFN##_Fct _##_Fct = (PFN##_Fct)Record(#_Fct, (PFNOpenGL*)(&_##_Fct)); }
+#	define ANT_GL_IMPL(_Fct) \
+		namespace GL { PFN##_Fct _##_Fct = (PFN##_Fct)Record(#_Fct, (PFNOpenGL*)(&_##_Fct)); }
 #elif defined(ANT_UNIX) || defined(ANT_OSX)
-#   define ANT_GL_IMPL(_Fct) \
-        namespace GL { PFN##_Fct _##_Fct = _Fct; }
-#   if !defined(APIENTRY)
-#       define APIENTRY
-#   endif
+#	define ANT_GL_IMPL(_Fct) \
+		namespace GL { PFN##_Fct _##_Fct = _Fct; }
+#	if !defined(APIENTRY)
+#		define APIENTRY
+#	endif
 #endif
 
 
@@ -37,15 +37,15 @@ int UnloadOpenGL();
 
 namespace GL
 {
-    extern "C" { typedef void (APIENTRY* PFNOpenGL)(); }
-    PFNOpenGL Record(const char *_FuncName, PFNOpenGL *_FuncPtr);
+	extern "C" { typedef void (APIENTRY* PFNOpenGL)(); }
+	PFNOpenGL Record(const char *_FuncName, PFNOpenGL *_FuncPtr);
 
-    extern "C" { typedef PFNOpenGL (APIENTRY *PFNGLGetProcAddress)(const char *); }
-    extern PFNGLGetProcAddress _glGetProcAddress;
+	extern "C" { typedef PFNOpenGL (APIENTRY *PFNGLGetProcAddress)(const char *); }
+	extern PFNGLGetProcAddress _glGetProcAddress;
 }
 using GL::_glGetProcAddress;
 
- 
+
 ANT_GL_DECL(void, glAccum, (GLenum op, GLfloat value))
 ANT_GL_DECL(void, glAlphaFunc, (GLenum func, GLclampf ref))
 ANT_GL_DECL(GLboolean, glAreTexturesResident, (GLsizei n, const GLuint *textures, GLboolean *residences))
@@ -391,7 +391,7 @@ ANT_GL_DECL(void, glViewport, (GLint x, GLint y, GLsizei width, GLsizei height))
 
 #ifdef ANT_WINDOWS
 ANT_GL_DECL(PROC, wglGetProcAddress, (LPCSTR))
-#endif                                                                                                                                                                                                                                                                                                                                                
+#endif
 
 
 #endif // !defined ANT_LOAD_OGL_INCLUDED
