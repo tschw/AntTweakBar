@@ -3,16 +3,11 @@ set(target ATBGuiRenderer)
 ###############################################################################
 # OpenGL Configuration
 
-#set(ATB_GUIRENDERER_LOAD_GL		ON		CACHE BOOL
-#		"Embed OpenGL loading code into the renderer")
-
 set(ATB_GUIRENDERER_USE_CORE_GL		ON		CACHE BOOL
 		"Enable OpenGL core profile rendering code")
 
 set(ATB_GUIRENDERER_USE_LEGACY_GL	ON		CACHE BOOL
 		"Enable legacy OpenGL rendering code")
-
-#mark_as_advanced(ATB_GUIRENDERER_LOAD_GL)
 
 ###############################################################################
 # Direct3D Configuration
