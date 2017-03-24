@@ -297,9 +297,6 @@ int CTwGraphDirect3D10::Init()
 
 	// Compile shaders
 	DWORD shaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
-	#if defined( DEBUG ) || defined( _DEBUG )
-		// shaderFlags |= D3D10_SHADER_DEBUG; // no more supported
-	#endif
 	ID3D10Blob *compiledFX = NULL;
 	ID3D10Blob *errors = NULL;
 	HRESULT hr = _D3D10CompileEffectFromMemory(g_ShaderFX, strlen(g_ShaderFX), "AntTweakBarFX", NULL, NULL, shaderFlags, 0, &compiledFX, &errors);
