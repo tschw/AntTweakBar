@@ -13,10 +13,6 @@
 #include "TwDirect3D9.h"
 
 #include <d3d9.h>
-#ifdef _DEBUG
-//	#include <dxerr9.h>
-//	#pragma comment(lib, "dxerr9")
-#endif // _DEBUG
 
 using namespace std;
 
