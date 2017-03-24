@@ -90,4 +90,8 @@
 #	define	ANT_OGL_HEADER_INCLUDED
 #endif
 
+#if !defined(NDEBUG) && !defined(_DEBUG)
+#	define _DEBUG
+#endif
+
 #endif	// !defined ANT_TW_PRECOMP_INCLUDED
