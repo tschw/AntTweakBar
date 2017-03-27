@@ -45,6 +45,7 @@ public:
 	virtual void		SetScissor(int _X0, int _Y0, int _Width, int _Height);
 
 protected:
+	bool				m_UseOpenGLES;
 	bool				m_Drawing;
 	GLuint				m_FontTexID;
 	const CTexFont *	m_FontTex;
@@ -57,8 +58,10 @@ protected:
 	GLboolean			m_PrevCullFace;
 	GLboolean			m_PrevDepthTest;
 	GLboolean			m_PrevBlend;
-	GLint				m_PrevSrcBlend;
-	GLint				m_PrevDstBlend;
+	GLint				m_PrevSrcBlendCol;
+	GLint				m_PrevDstBlendCol;
+	GLint				m_PrevSrcBlendA;
+	GLint				m_PrevDstBlendA;
 	GLboolean			m_PrevScissorTest;
 	GLint				m_PrevScissorBox[4];
 	GLint				m_PrevViewport[4];

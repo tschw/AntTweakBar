@@ -42,7 +42,7 @@ static const char *g_ErrCantUnloadOGL  = "Cannot unload OpenGL library";
 			#ifdef ANT_WINDOWS
 				OutputDebugString(msg);
 			#endif
-			fprintf(stderr, msg);
+			fprintf(stderr, "%s", msg);
 		}
 	}
 #	ifdef __FUNCTION__
@@ -56,16 +56,21 @@ static const char *g_ErrCantUnloadOGL  = "Cannot unload OpenGL library";
 
 //	---------------------------------------------------------------------------
 
-static GLuint BindFont(const CTexFont *_Font)
+static GLuint BindFont(const CTexFont *_Font, bool useGlES)
 {
 	GLuint TexID = 0;
 	_glGenTextures(1, &TexID);
 	_glBindTexture(GL_TEXTURE_2D, TexID);
-	_glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_FALSE);
-	_glPixelStorei(GL_UNPACK_LSB_FIRST, GL_FALSE);
+	CHECK_GL_ERROR;
+	if ( !useGlES )
+	{
+		_glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_FALSE);
+		_glPixelStorei(GL_UNPACK_LSB_FIRST, GL_FALSE);
+	}
 	_glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	_glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 	_glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+	CHECK_GL_ERROR;
 	_glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	_glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, _Font->m_TexWidth, _Font->m_TexHeight, 0, GL_RED, GL_UNSIGNED_BYTE, _Font->m_TexBytes);
 	_glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -73,6 +78,7 @@ static GLuint BindFont(const CTexFont *_Font)
 	_glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	_glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	_glBindTexture(GL_TEXTURE_2D, 0);
+	CHECK_GL_ERROR;
 
 	return TexID;
 }
@@ -85,18 +91,40 @@ static void UnbindFont(GLuint _FontTexID)
 
 //	---------------------------------------------------------------------------
 
-static GLuint CompileShader(GLchar const* source, GLuint shader)
+static GLuint CreateShader(GLchar const* source, GLenum type, bool useGlES)
 {
+	GLuint shader = _glCreateShader(type);
 
-	char const* glVersion = (char const*) _glGetString( GL_VERSION );
-	bool isGlES = strncmp( glVersion, "OpenGL ES", 9 ) == 0;
+	char const* sourceStrings[5];
+	sourceStrings[0] = useGlES ? "#version 300 es\n" : "#version 130\n";
+	sourceStrings[1] =
+			"#if __VERSION__ >= 130\n"
 
-	char const* sourceStrings[2];
-	sourceStrings[ 0 ] = isGlES ? "#version 100\n" : "#version 150\n";
+				"#define IN in\n"
+				"#define OUT out\n"
+				"#define FRAGHDR out vec4 outColor;\n"
+				"#define FRAGOUT outColor\n"
+				"#define TEXTURE texture\n"
 
-	sourceStrings[ 1 ] = source;
+			"#else\n"
 
-	_glShaderSource(shader, 2, sourceStrings, NULL);
+			;
+	sourceStrings[2] =
+			type == GL_VERTEX_SHADER ?
+				"#define IN attribute\n"
+				"#define OUT varying\n"
+			:
+				"#define IN varying\n"
+				"#define FRAGHDR\n"
+				"#define FRAGOUT gl_FragColor\n"
+				"#define TEXTURE texture2D\n"
+			;
+	sourceStrings[3] =
+			"#endif\n"
+			;
+	sourceStrings[4] = source;
+
+	_glShaderSource(shader, 5, sourceStrings, NULL);
 	_glCompileShader(shader); CHECK_GL_ERROR;
 
 	GLint status;
@@ -179,25 +207,26 @@ int CTwGraphOpenGLCore::Init()
 		return 0;
 	}
 
+	char const* glVersion = (char const*) _glGetString( GL_VERSION );
+	m_UseOpenGLES = strncmp( glVersion, "OpenGL ES", 9 ) == 0;
+
 	// Create line/rect shaders
 	const GLchar *lineRectVS =
 			"precision highp float;"
-			"in vec3 vertex;"
-			"in vec4 color;"
-			"out vec4 fcolor;"
-			"void main() { gl_Position = vec4(vertex, 1); fcolor = color; }";
+			"IN vec3 vertex;"
+			"IN vec4 color;"
+			"OUT vec4 fcolor;"
+			"void main() { gl_Position = vec4(vertex, 1); fcolor = color.bgra; }";
 
-	m_LineRectVS = _glCreateShader(GL_VERTEX_SHADER);
-	CompileShader(lineRectVS, m_LineRectVS);
+	m_LineRectVS = CreateShader(lineRectVS, GL_VERTEX_SHADER, m_UseOpenGLES);
 
 	const GLchar *lineRectFS =
-			"precision highp float;"
-			"in vec4 fcolor;"
-			"out vec4 outColor;"
-			"void main() { outColor = fcolor; }";
+			"precision mediump float;"
+			"FRAGHDR "
+			"IN vec4 fcolor;"
+			"void main() { FRAGOUT = fcolor; }";
 
-	m_LineRectFS = _glCreateShader(GL_FRAGMENT_SHADER);
-	CompileShader(lineRectFS, m_LineRectFS);
+	m_LineRectFS = CreateShader(lineRectFS, GL_FRAGMENT_SHADER, m_UseOpenGLES);
 
 	m_LineRectProgram = _glCreateProgram();
 	_glAttachShader(m_LineRectProgram, m_LineRectVS);
@@ -223,31 +252,29 @@ int CTwGraphOpenGLCore::Init()
 			"precision highp float;"
 			"uniform vec2 offset;"
 			"uniform vec2 wndSize;"
-			"in vec2 vertex;"
-			"in vec4 color;"
-			"out vec4 fcolor;"
+			"IN vec2 vertex;"
+			"IN vec4 color;"
+			"OUT vec4 fcolor;"
 			"void main() {"
 			" gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
-			" fcolor = color;"
+			" fcolor = color.bgra;"
 			"}";
 
-	m_TriVS = _glCreateShader(GL_VERTEX_SHADER);
-	CompileShader(triVS, m_TriVS);
+	m_TriVS = CreateShader(triVS, GL_VERTEX_SHADER, m_UseOpenGLES);
 
 	const GLchar *triUniVS =
 			"precision highp float;"
 			"uniform vec2 offset;"
 			"uniform vec2 wndSize;"
 			"uniform vec4 color;"
-			"in vec2 vertex;"
-			"out vec4 fcolor;"
+			"IN vec2 vertex;"
+			"OUT vec4 fcolor;"
 			"void main() {"
 			" gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
-			" fcolor = color;"
+			" fcolor = color.bgra;"
 			"}";
 
-	m_TriUniVS = _glCreateShader(GL_VERTEX_SHADER);
-	CompileShader(triUniVS, m_TriUniVS);
+	m_TriUniVS = CreateShader(triUniVS, GL_VERTEX_SHADER, m_UseOpenGLES);
 
 	m_TriFS = m_TriUniFS = m_LineRectFS;
 
@@ -271,55 +298,48 @@ int CTwGraphOpenGLCore::Init()
 	m_TriUniLocationColor = _glGetUniformLocation(m_TriUniProgram, "color");
 
 	const GLchar *triTexFS =
-			"precision highp float;"
+			"precision mediump float;"
+			"FRAGHDR "
 			"uniform sampler2D tex;"
-			"in vec2 fuv;"
-			"in vec4 fcolor;"
-			"out vec4 outColor;"
-			"\n#if __VERSION__ >= 130\n"
-			"void main() { outColor.rgb = fcolor.bgr; outColor.a = fcolor.a * texture(tex, fuv).r; }"
-			"\n#else\n"
-			"void main() { outColor.rgb = fcolor.bgr; outColor.a = fcolor.a * texture2D(tex, fuv).r; }"
-			"\n#endif\n";
+			"IN vec2 fuv;"
+			"IN vec4 fcolor;"
+			"void main() { FRAGOUT.rgb = fcolor.bgr; FRAGOUT.a = fcolor.a * TEXTURE(tex, fuv).r; }";
 
-	m_TriTexFS = _glCreateShader(GL_FRAGMENT_SHADER);
-	CompileShader(triTexFS, m_TriTexFS);
+	m_TriTexFS = CreateShader(triTexFS, GL_FRAGMENT_SHADER, m_UseOpenGLES);
 
 	const GLchar *triTexVS =
 			"precision highp float;"
 			"uniform vec2 offset;"
 			"uniform vec2 wndSize;"
-			"in vec2 vertex;"
-			"in vec2 uv;"
-			"in vec4 color;"
-			"out vec2 fuv;"
-			"out vec4 fcolor;"
+			"IN vec2 vertex;"
+			"IN vec2 uv;"
+			"IN vec4 color;"
+			"OUT vec2 fuv;"
+			"OUT vec4 fcolor;"
 			"void main() {"
 			" gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
 			" fuv = uv;"
-			" fcolor = color;"
+			" fcolor = color.bgra;"
 			"}";
 
-	m_TriTexVS = _glCreateShader(GL_VERTEX_SHADER);
-	CompileShader(triTexVS, m_TriTexVS);
+	m_TriTexVS = CreateShader(triTexVS, GL_VERTEX_SHADER, m_UseOpenGLES);
 
 	const GLchar *triTexUniVS =
 			"precision highp float;"
 			"uniform vec2 offset;"
 			"uniform vec2 wndSize;"
 			"uniform vec4 color;"
-			"in vec2 vertex;"
-			"in vec2 uv;"
-			"out vec4 fcolor;"
-			"out vec2 fuv;"
+			"IN vec2 vertex;"
+			"IN vec2 uv;"
+			"OUT vec4 fcolor;"
+			"OUT vec2 fuv;"
 			"void main() {"
 			" gl_Position = vec4(2.0*(vertex.x+offset.x-0.5)/wndSize.x - 1.0, 1.0 - 2.0*(vertex.y+offset.y-0.5)/wndSize.y, 0, 1);"
 			" fuv = uv;"
-			" fcolor = color;"
+			" fcolor = color.bgra;"
 			"}";
 
-	m_TriTexUniVS = _glCreateShader(GL_VERTEX_SHADER);
-	CompileShader(triTexUniVS, m_TriTexUniVS);
+	m_TriTexUniVS = CreateShader(triTexUniVS, GL_VERTEX_SHADER, m_UseOpenGLES);
 
 	m_TriTexUniFS = m_TriTexFS;
 
@@ -436,8 +456,11 @@ void CTwGraphOpenGLCore::BeginDraw(int _WndWidth, int _WndHeight)
 	_glGetFloatv(GL_LINE_WIDTH, &m_PrevLineWidth); CHECK_GL_ERROR;
 	_glLineWidth(1); CHECK_GL_ERROR;
 
-	m_PrevLineSmooth = _glIsEnabled(GL_LINE_SMOOTH);
-	_glDisable(GL_LINE_SMOOTH); CHECK_GL_ERROR;
+	if (!m_UseOpenGLES)
+	{
+		m_PrevLineSmooth = _glIsEnabled(GL_LINE_SMOOTH);
+		_glDisable(GL_LINE_SMOOTH); CHECK_GL_ERROR;
+	}
 
 	m_PrevCullFace = _glIsEnabled(GL_CULL_FACE);
 	_glDisable(GL_CULL_FACE); CHECK_GL_ERROR;
@@ -453,8 +476,10 @@ void CTwGraphOpenGLCore::BeginDraw(int _WndWidth, int _WndHeight)
 
 	_glGetIntegerv(GL_SCISSOR_BOX, m_PrevScissorBox); CHECK_GL_ERROR;
 
-	_glGetIntegerv(GL_BLEND_SRC, &m_PrevSrcBlend); CHECK_GL_ERROR;
-	_glGetIntegerv(GL_BLEND_DST, &m_PrevDstBlend); CHECK_GL_ERROR;
+	_glGetIntegerv(GL_BLEND_SRC_RGB, &m_PrevSrcBlendCol); CHECK_GL_ERROR;
+	_glGetIntegerv(GL_BLEND_DST_RGB, &m_PrevDstBlendCol); CHECK_GL_ERROR;
+	_glGetIntegerv(GL_BLEND_SRC_ALPHA, &m_PrevSrcBlendA); CHECK_GL_ERROR;
+	_glGetIntegerv(GL_BLEND_DST_ALPHA, &m_PrevDstBlendA); CHECK_GL_ERROR;
 	_glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECK_GL_ERROR;
 
 	m_PrevProgramObject = 0;
@@ -483,54 +508,42 @@ void CTwGraphOpenGLCore::EndDraw()
 
 	_glLineWidth(m_PrevLineWidth); CHECK_GL_ERROR;
 
-	if( m_PrevLineSmooth )
+	if( !m_UseOpenGLES )
 	{
-	  _glEnable(GL_LINE_SMOOTH); CHECK_GL_ERROR;
-	}
-	else
-	{
-	  _glDisable(GL_LINE_SMOOTH); CHECK_GL_ERROR;
+		if( m_PrevLineSmooth )
+			_glEnable(GL_LINE_SMOOTH);
+		else
+			_glDisable(GL_LINE_SMOOTH);
+		CHECK_GL_ERROR;
 	}
 
 	if( m_PrevCullFace )
-	{
-	  _glEnable(GL_CULL_FACE); CHECK_GL_ERROR;
-	}
+		_glEnable(GL_CULL_FACE);
 	else
-	{
-	  _glDisable(GL_CULL_FACE); CHECK_GL_ERROR;
-	}
+		_glDisable(GL_CULL_FACE);
+	CHECK_GL_ERROR;
 
 	if( m_PrevDepthTest )
-	{
-	  _glEnable(GL_DEPTH_TEST); CHECK_GL_ERROR;
-	}
+		_glEnable(GL_DEPTH_TEST);
 	else
-	{
-	  _glDisable(GL_DEPTH_TEST); CHECK_GL_ERROR;
-	}
+		_glDisable(GL_DEPTH_TEST);
+	CHECK_GL_ERROR;
 
 	if( m_PrevBlend )
-	{
-	  _glEnable(GL_BLEND); CHECK_GL_ERROR;
-	}
+		_glEnable(GL_BLEND);
 	else
-	{
-	  _glDisable(GL_BLEND); CHECK_GL_ERROR;
-	}
+		_glDisable(GL_BLEND);
+	CHECK_GL_ERROR;
 
 	if( m_PrevScissorTest )
-	{
-	  _glEnable(GL_SCISSOR_TEST); CHECK_GL_ERROR;
-	}
+		_glEnable(GL_SCISSOR_TEST);
 	else
-	{
-	  _glDisable(GL_SCISSOR_TEST); CHECK_GL_ERROR;
-	}
+		_glDisable(GL_SCISSOR_TEST);
+	CHECK_GL_ERROR;
 
 	_glScissor(m_PrevScissorBox[0], m_PrevScissorBox[1], m_PrevScissorBox[2], m_PrevScissorBox[3]); CHECK_GL_ERROR;
 
-	_glBlendFunc(m_PrevSrcBlend, m_PrevDstBlend); CHECK_GL_ERROR;
+	_glBlendFuncSeparate(m_PrevSrcBlendCol, m_PrevDstBlendCol, m_PrevSrcBlendA, m_PrevDstBlendA ); CHECK_GL_ERROR;
 
 	_glBindTexture(GL_TEXTURE_2D, m_PrevTexture); CHECK_GL_ERROR;
 
@@ -584,10 +597,14 @@ void CTwGraphOpenGLCore::DrawLine(int _X0, int _Y0, int _X1, int _Y1, color32 _C
 	const GLfloat dx = 0;
 	//GLfloat dy = -0.2f;
 	const GLfloat dy = -0.5f;
-	if( _AntiAliased )
-		_glEnable(GL_LINE_SMOOTH);
-	else
-		_glDisable(GL_LINE_SMOOTH);
+
+	if ( !m_UseOpenGLES )
+	{
+		if( _AntiAliased )
+			_glEnable(GL_LINE_SMOOTH);
+		else
+			_glDisable(GL_LINE_SMOOTH);
+	}
 
 	_glBindVertexArray(m_LineRectVArray);
 
@@ -604,13 +621,13 @@ void CTwGraphOpenGLCore::DrawLine(int _X0, int _Y0, int _X1, int _Y1, color32 _C
 	color32 colors[] = { _Color0, _Color1 };
 	_glBindBuffer(GL_ARRAY_BUFFER, m_LineRectColors);
 	_glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(colors), colors);
-	_glVertexAttribPointer(1, GL_BGRA, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+	_glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 	_glEnableVertexAttribArray(1);
 
 	_glUseProgram(m_LineRectProgram);
 	_glDrawArrays(GL_LINES, 0, 2);
 
-	if( _AntiAliased )
+	if( !m_UseOpenGLES && _AntiAliased )
 		_glDisable(GL_LINE_SMOOTH);
 
 	CHECK_GL_ERROR;
@@ -648,7 +665,7 @@ void CTwGraphOpenGLCore::DrawRect(int _X0, int _Y0, int _X1, int _Y1, color32 _C
 	GLuint colors[] = { _Color00, _Color10, _Color01, _Color11 };
 	_glBindBuffer(GL_ARRAY_BUFFER, m_LineRectColors);
 	_glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(colors), colors);
-	_glVertexAttribPointer(1, GL_BGRA, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+	_glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 	_glEnableVertexAttribArray(1);
 
 	_glUseProgram(m_LineRectProgram);
@@ -683,7 +700,7 @@ void CTwGraphOpenGLCore::BuildText(void *_TextObj, const std::string *_TextLines
 	if( _Font != m_FontTex )
 	{
 		UnbindFont(m_FontTexID);
-		m_FontTexID = BindFont(_Font);
+		m_FontTexID = BindFont(_Font, m_UseOpenGLES);
 		m_FontTex = _Font;
 	}
 	CTextObj *TextObj = static_cast<CTextObj *>(_TextObj);
@@ -793,7 +810,7 @@ void CTwGraphOpenGLCore::DrawText(void *_TextObj, int _X, int _Y, color32 _Color
 		{
 			_glBindBuffer(GL_ARRAY_BUFFER, m_TriColors);
 			_glBufferSubData(GL_ARRAY_BUFFER, 0, numBgVerts*sizeof(color32), &(TextObj->m_BgColors[0]));
-			_glVertexAttribPointer(1, GL_BGRA, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+			_glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 			_glEnableVertexAttribArray(1);
 
 			_glUseProgram(m_TriProgram);
@@ -836,7 +853,7 @@ void CTwGraphOpenGLCore::DrawText(void *_TextObj, int _X, int _Y, color32 _Color
 		{
 			_glBindBuffer(GL_ARRAY_BUFFER, m_TriColors);
 			_glBufferSubData(GL_ARRAY_BUFFER, 0, numTextVerts*sizeof(color32), &(TextObj->m_Colors[0]));
-			_glVertexAttribPointer(2, GL_BGRA, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+			_glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 			_glEnableVertexAttribArray(2);
 
 			_glUseProgram(m_TriTexProgram);
@@ -888,6 +905,7 @@ void CTwGraphOpenGLCore::SetScissor(int _X0, int _Y0, int _Width, int _Height)
 	}
 	else
 		_glDisable(GL_SCISSOR_TEST);
+	CHECK_GL_ERROR;
 }
 
 //	---------------------------------------------------------------------------
@@ -930,7 +948,7 @@ void CTwGraphOpenGLCore::DrawTriangles(int _NumTriangles, int *_Vertices, color3
 
 	_glBindBuffer(GL_ARRAY_BUFFER, m_TriColors);
 	_glBufferSubData(GL_ARRAY_BUFFER, 0, numVerts*sizeof(color32), _Colors);
-	_glVertexAttribPointer(1, GL_BGRA, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+	_glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 	_glEnableVertexAttribArray(1);
 
 	_glDrawArrays(GL_TRIANGLES, 0, (GLsizei)numVerts);
@@ -942,7 +960,6 @@ void CTwGraphOpenGLCore::DrawTriangles(int _NumTriangles, int *_Vertices, color3
 		_glEnable(GL_CULL_FACE);
 	else
 		_glDisable(GL_CULL_FACE);
-
 	CHECK_GL_ERROR;
 }
 

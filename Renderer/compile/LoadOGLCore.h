@@ -409,8 +409,16 @@ ANT_GL_CORE_DECL(PROC, wglGetProcAddress, (LPCSTR))
 #ifndef GL_TEXTURE0
 #	define GL_TEXTURE0			0x84C0
 #endif
-#ifndef GL_BGRA
-#	define GL_BGRA				0x80E1
+#ifndef GL_BLEND_DST_RGB
+#	define GL_BLEND_DST_RGB                  0x80C8
 #endif
-
+#ifndef GL_BLEND_SRC_RGB
+#	define GL_BLEND_SRC_RGB                  0x80C9
+#endif
+#ifndef GL_BLEND_DST_ALPHA
+#	define GL_BLEND_DST_ALPHA                0x80CA
+#endif
+#ifndef GL_BLEND_SRC_ALPHA
+#	define GL_BLEND_SRC_ALPHA                0x80CB
+#endif
 #endif // !defined ANT_LOAD_OGL_CORE_INCLUDED
