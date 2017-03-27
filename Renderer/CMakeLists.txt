@@ -99,6 +99,8 @@ set(d3d11HlslFile "compile/TwDirect3D11.hlsl")
 
 if (ATB_GUIRENDERER_USE_D3D11)
 
+	target_include_directories(${target} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
 	set(d3d11Renderer "compile/TwDirect3D11.cpp")
 
 	set(vertex_shaders
