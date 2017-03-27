@@ -54,18 +54,18 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow)
 {
 	// Register our window class
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW|CS_VREDRAW, MessageProc,
-						0L, 0L, instance, NULL, NULL, NULL, NULL, L"TwDX10", NULL };
+						0L, 0L, instance, NULL, NULL, NULL, NULL, "TwDX10", NULL };
 	RegisterClassEx(&wcex);
 
 	// Create a window
 	RECT rc = { 0, 0, 640, 480 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-	HWND wnd = CreateWindow(L"TwDX10", L"AntTweakBar simple example using DirectX10",
+	HWND wnd = CreateWindow("TwDX10", "AntTweakBar simple example using DirectX10",
 							WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 							rc.right-rc.left, rc.bottom-rc.top, NULL, NULL, instance, NULL);
 	if( !wnd )
 	{
-		MessageBox(NULL, L"Cannot create window", L"Error", MB_OK|MB_ICONERROR);
+		MessageBox(NULL, "Cannot create window", "Error", MB_OK|MB_ICONERROR);
 		return 0;
 	}
 
@@ -73,7 +73,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow)
 	if( FAILED(InitDevice(wnd)) )
 	{
 		Cleanup();
-		MessageBox(wnd, L"Cannot create D3D10 device", L"Error", MB_OK|MB_ICONERROR);
+		MessageBox(wnd, "Cannot create D3D10 device", "Error", MB_OK|MB_ICONERROR);
 		return 0;
 	}
 
@@ -81,7 +81,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow)
 	if( FAILED(InitScene()) )
 	{
 		Cleanup();
-		MessageBox(wnd, L"Scene initialization failed.", L"Error", MB_OK|MB_ICONERROR);
+		MessageBox(wnd, "Scene initialization failed.", "Error", MB_OK|MB_ICONERROR);
 		return 0;
 	}
 
@@ -175,8 +175,8 @@ HRESULT InitDevice(HWND wnd)
 		hr = D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_REFERENCE, NULL, createDeviceFlags,
 										   D3D10_SDK_VERSION, &g_SwapChainDesc, &g_SwapChain, &g_D3DDevice);
 		if( SUCCEEDED(hr) )
-			MessageBox(wnd, L"No DX10 hardware acceleration found.\nSwitching to REFERENCE driver (very slow).",
-					   L"Warning", MB_OK|MB_ICONWARNING);
+			MessageBox(wnd, "No DX10 hardware acceleration found.\nSwitching to REFERENCE driver (very slow).",
+					   "Warning", MB_OK|MB_ICONWARNING);
 		else
 			return hr;
 	}
@@ -248,7 +248,7 @@ HRESULT InitScene()
 
 	if( FAILED( hr ) )
 	{
-		MessageBox( NULL, L"Effect creation failed", L"Error", MB_OK );
+		MessageBox( NULL, "Effect creation failed", "Error", MB_OK );
 		return hr;
 	}
 

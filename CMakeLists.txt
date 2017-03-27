@@ -9,5 +9,5 @@ include(Functions)
 
 add_subdirectory(Renderer)
 add_subdirectory(TweakBar)
-# add_subdirectory(Examples)
+add_subdirectory(Examples)
 

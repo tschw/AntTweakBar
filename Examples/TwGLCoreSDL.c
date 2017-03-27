@@ -15,31 +15,22 @@
 
 #include <AntTweakBar.h>
 
-#ifdef _WIN32
-//	MiniSDL13.h is provided to avoid the need of having SDL installed to
-//	recompile this example. Do not use it in your own programs, better
-//	install and use the actual SDL library SDK.
-#	define USE_MINI_SDL
-#endif
-
-//#define GL3_PROTOTYPES 1 ////
-//#include <GL3/gl3.h>	   ////
-
-#ifdef USE_MINI_SDL
-#	include "../src/MiniSDL13.h"
+#ifdef USE_SDL2
+#	include <SDL2/SDL.h>
+#	include <SDL2/SDL_opengl.h>
 #else
 #	include <SDL/SDL.h>
+#	include <SDL/SDL_opengl.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef _WIN32
-#	include <windows.h> // required by gl.h
-#endif
-#include <GL/gl.h>
-#include <GL/glu.h>
+
+
+// #define USE_OPENGL_ES 2
+// #define USE_OPENGL_ES 3
 
 
 // In this example, we draw a simple rotating square using the OpenGL core profile
@@ -155,6 +146,13 @@ int LoadGLCoreFunctions()
 		return 1;
 }
 
+void checkGlError()
+{
+	GLenum error;
+	if ((error = glGetError()) != GL_NO_ERROR)
+		fprintf(stderr, "GL error detected: 0x%04X\n", error);
+}
+
 
 // Shaders globals
 GLuint vshader, fshader, program, varray, buffer;
@@ -165,20 +163,42 @@ float FLOAT_PI = 3.14159265f;
 
 void InitRender()
 {
+#ifdef USE_OPENGL_ES
+	// Note: Using GLSL ES 2 shaders, ES 3 provides backward compatibility.
+
 	// Vertex shader
-	char *vsource[] = {
-		"#version 150 core\n"
+	char const*vsource[] = {
+		"#version 100\n"
+		"precision highp float;"
 		"uniform float cosa, sina;"
-		"in vec3 vertex;"
-		"void main() { gl_Position = vec4(cosa*vertex.x-sina*vertex.y, sina*vertex.x+cosa*vertex.y, 0, 1); }"
+		"attribute vec3 vertex;"
+		"void main() { gl_Position = vec4(cosa*vertex.x-sina*vertex.y, sina*vertex.x+cosa*vertex.y, 0., 1.); }"
 	};
 	// Fragment shader
-	char *fsource[] = {
-		"#version 150 core\n"
+	char const*fsource[] = {
+		"#version 100\n"
+		"precision mediump float;"
 		"uniform vec3 color;"
-		"out vec4 fcolor;"
-		"void main() { fcolor = vec4(color, 1); }"
+		"void main() { gl_FragColor = vec4(color, 1.); }"
 	};
+#else
+	// Vertex shader
+	char const*vsource[] = {
+		"#version 150 core\n"
+		"precision highp float;"
+		"uniform float cosa, sina;"
+		"in vec3 vertex;"
+		"void main() { gl_Position = vec4(cosa*vertex.x-sina*vertex.y, sina*vertex.x+cosa*vertex.y, 0., 1.); }"
+	};
+	// Fragment shader
+	char const*fsource[] = {
+		"#version 150 core\n"
+		"precision mediump float;"
+		"uniform vec3 color;"
+		"out vec4 fColor;"
+		"void main() { fColor = vec4(color, 1.); }"
+	};
+#endif
 	// Geometry vertex array
 	GLfloat vertices[] = {
 		-0.5f,	0.5f, 0,
@@ -218,6 +238,8 @@ void InitRender()
 	// GL states
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+
+	checkGlError();
 }
 
 void UninitRender()
@@ -236,6 +258,8 @@ void Render()
 	_glUniform3f(colorloc, color[0], color[1], color[2]);
 	_glBindVertexArray(varray);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	checkGlError();
 }
 
 
@@ -254,17 +278,16 @@ TwBar *CreateTweakBar()
 	return bar;
 }
 
-
-// SDL redefines main
-#ifdef main
-#	undef main
-#endif
-
-int main()
+int main( int argc, char* argv[] )
 {
+#if SDL_MAJOR_VERSION >= 2
+	SDL_Window		*window;
+	SDL_GLContext	*context;
+#else
 	const SDL_VideoInfo* video = NULL;
-	int width  = 480, height = 480;
 	int bpp, flags;
+#endif
+	int width  = 480, height = 480;
 	int quit = 0;
 
 	// Initialize SDL, then get the current video mode and use it to create a SDL window.
@@ -272,37 +295,81 @@ int main()
 	{
 		fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
 		SDL_Quit();
-		exit(1);
+		return 1;
 	}
-	video = SDL_GetVideoInfo();
-	if (!video)
-	{
-		fprintf(stderr, "Video query failed: %s\n", SDL_GetError());
-		SDL_Quit();
-		exit(1);
-	}
+#if SDL_MAJOR_VERSION > 1 || SDL_MINOR_VERSION >= 3
+	// Note: There's no way to request that with SDL < 1.3, so in that case
+	// it comes down to whether the graphics driver gives us a sufficiently
+	// capable OpenGL context.
+
+#	ifndef USE_OPENGL_ES
 	// Request GL context to be OpenGL 3.2 Core Profile
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(
+			SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#	else
+	// Request GL context to be OpenGL 3.2 Core Profile
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, USE_OPENGL_ES);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(
+			SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+
+#	endif
+
+
+#endif
+
 	// Other GL attributes
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+#if SDL_MAJOR_VERSION >= 2
+
+	window = SDL_CreateWindow("AntTweakBar+GLCore+SDL",
+				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
+				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |SDL_WINDOW_RESIZABLE);
+	if (!window)
+	{
+		fprintf(stderr, "Window creation failed: %s\n", SDL_GetError());
+		SDL_Quit();
+		return 1;
+	}
+
+	context = SDL_GL_CreateContext(window);
+	if (!window)
+	{
+		fprintf(stderr, "GL context creation failed: %s\n", SDL_GetError());
+		SDL_Quit();
+		return 1;
+	}
+
+#else
+	video = SDL_GetVideoInfo();
+	if (!video)
+	{
+		fprintf(stderr, "Video query failed: %s\n", SDL_GetError());
+		SDL_Quit();
+		return 1;
+	}
 	bpp = video->vfmt->BitsPerPixel;
-	flags = SDL_OPENGL | SDL_HWSURFACE;
+	flags = SDL_OPENGL | SDL_HWSURFACE | SDL_RESIZABLE;
 	if (!SDL_SetVideoMode(width, height, bpp, flags))
 	{
 		fprintf(stderr, "Video mode set failed: %s\n", SDL_GetError());
 		SDL_Quit();
-		exit(1);
+		return 1;
 	}
+
 	SDL_WM_SetCaption("AntTweakBar example using OpenGL Core Profile and SDL", "AntTweakBar+GLCore+SDL");
 
 	// Enable SDL unicode and key-repeat
 	SDL_EnableUNICODE(1);
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+#endif
 
 	// Load some OpenGL core functions
 	if (!LoadGLCoreFunctions())
@@ -336,7 +403,6 @@ int main()
 	{
 		SDL_Event event;
 		int handled;
-		GLenum error;
 
 		// Clear screen
 		glClearColor(0.5f, 0.75f, 0.8f, 1);
@@ -352,8 +418,12 @@ int main()
 		// Draw tweak bars
 		TwDraw();
 
+#if SDL_MAJOR_VERSION >= 2
+		SDL_GL_SwapWindow(window);
+#else
 		// Present frame buffer
 		SDL_GL_SwapBuffers();
+#endif
 
 		// Process incoming events
 		while (SDL_PollEvent(&event))
@@ -370,19 +440,25 @@ int main()
 					quit = 1;
 					break;
 
+#if SDL_MAJOR_VERSION >= 2
+				case SDL_WINDOWEVENT:
+					if (event.window.event != SDL_WINDOWEVENT_SIZE_CHANGED) break;
+					SDL_GL_GetDrawableSize(window, &width, &height);
+
+#else
 				case SDL_VIDEORESIZE:	// Window size has changed
 					// Resize SDL video mode
 					width = event.resize.w;
 					height = event.resize.h;
 					if (!SDL_SetVideoMode(width, height, bpp, flags))
 						fprintf(stderr, "WARNING: Video mode set failed: %s\n", SDL_GetError());
+#endif
 
 					// Resize OpenGL viewport
 					glViewport(0, 0, width, height);
 
 					// Restore OpenGL states
 					InitRender();
-
 					// TwWindowSize has been called by TwEventSDL,
 					// so it is not necessary to call it again here.
 
@@ -391,8 +467,6 @@ int main()
 			}
 		}
 
-		while ((error = glGetError()) != GL_NO_ERROR)
-			fprintf(stderr, "GL error detected: 0x%04X\n", error);
 
 	} // End of main loop
 

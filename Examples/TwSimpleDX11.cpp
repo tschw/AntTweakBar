@@ -37,8 +37,8 @@
 // fxc /T vs_4_0_level_9_1 /E MainVS /Fh $(IntDir)\TwSimpleDX11_VS.h TwSimpleDX11.hlsl
 // fxc /T ps_4_0_level_9_1 /E MainPS /Fh $(IntDir)\TwSimpleDX11_PS.h TwSimpleDX11.hlsl
 //
-#include "TwSimpleDX11_VS.h"
-#include "TwSimpleDX11_PS.h"
+#include "TwSimpleDX11_MainVS.h"
+#include "TwSimpleDX11_MainPS.h"
 
 
 // D3D objects
@@ -287,18 +287,18 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow)
 {
 	// Register our window class
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW|CS_VREDRAW, MessageProc,
-						0L, 0L, instance, NULL, NULL, NULL, NULL, L"TwDX11", NULL };
+						0L, 0L, instance, NULL, NULL, NULL, NULL, "TwDX11", NULL };
 	RegisterClassEx(&wcex);
 
 	// Create a window
 	RECT rc = { 0, 0, 640, 480 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-	HWND wnd = CreateWindow(L"TwDX11", L"AntTweakBar simple example using DirectX11",
+	HWND wnd = CreateWindow("TwDX11", "AntTweakBar simple example using DirectX11",
 							WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 							rc.right-rc.left, rc.bottom-rc.top, NULL, NULL, instance, NULL);
 	if (!wnd)
 	{
-		MessageBox(NULL, L"Cannot create window", L"Error", MB_OK|MB_ICONERROR);
+		MessageBox(NULL, "Cannot create window", "Error", MB_OK|MB_ICONERROR);
 		return 0;
 	}
 	ShowWindow(wnd, cmdShow);
@@ -307,7 +307,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow)
 	// Initialize D3D11
 	if (FAILED(InitDevice(wnd)))
 	{
-		MessageBox(wnd, L"Cannot create D3D11 device", L"Error", MB_OK|MB_ICONERROR);
+		MessageBox(wnd, "Cannot create D3D11 device", "Error", MB_OK|MB_ICONERROR);
 		Cleanup();
 		return 0;
 	}
@@ -315,7 +315,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow)
 	// Initialize the 3D scene
 	if (FAILED(InitScene()))
 	{
-		MessageBox(wnd, L"Scene initialization failed.", L"Error", MB_OK|MB_ICONERROR);
+		MessageBox(wnd, "Scene initialization failed.", "Error", MB_OK|MB_ICONERROR);
 		Cleanup();
 		return 0;
 	}
@@ -335,7 +335,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow)
 	TwSetParam(bar, NULL, "size", TW_PARAM_INT32, 2, barSize);
 
 	// Add variables to the tweak bar
-	TwAddVarCB(bar, "Level", TW_TYPE_INT32, SetSpongeLevelCB, GetSpongeLevelCB, NULL, "min=0 max=3 group=Sponge keyincr=l keydecr=L");
+	TwAddVarCB(bar, "Level", TW_TYPE_INT32, SetSpongeLevelCB, GetSpongeLevelCB, NULL, "min=0 max=3 group=Sponge keyincr=l keydecr=");
 	TwAddVarCB(bar, "Ambient Occlusion", TW_TYPE_BOOLCPP, SetSpongeAOCB, GetSpongeAOCB, NULL, "group=Sponge key=o");
 	TwAddVarRW(bar, "Rotation", TW_TYPE_QUAT4F, &g_SpongeRotation, "opened=true axisz=-z group=Sponge");
 	TwAddVarRW(bar, "Animation", TW_TYPE_BOOLCPP, &g_Animate, "group=Sponge key=a");
@@ -414,8 +414,8 @@ HRESULT InitDevice(HWND wnd)
 											   NULL, 0, D3D11_SDK_VERSION, &g_SwapChainDesc, &g_SwapChain,
 											   &g_D3DDev, NULL, &g_D3DDevCtx);
 			if (SUCCEEDED(hr))
-				MessageBox(wnd, L"No DX11 hardware acceleration found.\nSwitching to REFERENCE driver (very slow).",
-						   L"Warning", MB_OK|MB_ICONWARNING);
+				MessageBox(wnd, "No DX11 hardware acceleration found.\nSwitching to REFERENCE driver (very slow).",
+						   "Warning", MB_OK|MB_ICONWARNING);
 			else
 				return hr;
 		}
@@ -475,7 +475,7 @@ HRESULT InitScene()
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(Vertex, Position), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(Vertex, Normal), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMA", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(Vertex, Normal), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, offsetof(Vertex, AmbientColor), D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	hr = g_D3DDev->CreateInputLayout(layout, sizeof(layout)/sizeof(layout[0]), g_MainVS, sizeof(g_MainVS), &g_InputLayout);
