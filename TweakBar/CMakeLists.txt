@@ -1,11 +1,23 @@
 ###############################################################################
 # Configuration
 
-set(ATB_EVENT_HANDLER_WINDOWS	WIN32	CACHE BOOL
-		"Provide an event handler interface for use with Windows")
+if (WIN32)
+	set(ATB_EVENT_HANDLER_WINDOWS	ON	CACHE BOOL
+			"Provide an event handler interface for use with Windows")
+else()
+	set(ATB_EVENT_HANDLER_WINDOWS	OFF)
+endif()
 
-set(ATB_EVENT_HANDLER_X11		ON		CACHE BOOL
+
+if (WIN32 OR APPLE)
+	set(x11 OFF)
+else()
+	set(x11 ON)
+endif()
+
+set(ATB_EVENT_HANDLER_X11		${x11}	CACHE BOOL
 		"Provide an event handler interface for use with X11")
+
 
 set(ATB_EVENT_HANDLER_GLFW		ON		CACHE BOOL
 		"Provide an event handler interface for use with GLFW")
@@ -96,7 +108,7 @@ elseif (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
 		PROPERTIES OUTPUT_NAME "${PROJECT_NAME}64")
 endif()
 
-if (UNIX AND NOT APPLE)
+if ((UNIX AND NOT APPLE) OR ATB_EVENT_HANDLER_X11)
 	find_package(X11 REQUIRED)
 	target_link_libraries(AntTweakBar PRIVATE ${X11_LIBRARIES})
 endif()
