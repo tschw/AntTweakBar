@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.11)
 
 project(AntTweakBar)
 
@@ -10,4 +10,3 @@ include(Functions)
 add_subdirectory(Renderer)
 add_subdirectory(TweakBar)
 add_subdirectory(Examples)
-

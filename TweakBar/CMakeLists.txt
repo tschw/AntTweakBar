@@ -113,3 +113,23 @@ append_unless(defs	TW_NO_SFML_EVENTS				ATB_EVENT_HANDLER_SFML)
 
 target_compile_definitions(AntTweakBar PRIVATE ${defs})
 
+if (NOT CMAKE_INSTALL_LIBDIR)
+	set(CMAKE_INSTALL_LIBDIR "lib")
+endif()
+
+install(TARGETS AntTweakBar EXPORT AntTweakBarTargets
+		RUNTIME DESTINATION bin
+		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(FILES "include/AntTweakBar.h" DESTINATION include)
+
+set(ATB_CMAKE_PACKAGE_INSTALL_DIR
+		"${CMAKE_INSTALL_LIBDIR}/cmake/AntTweakBar"
+		CACHE PATH "Installation directory for CMake package configuration")
+mark_as_advanced(ATB_CMAKE_PACKAGE_INSTALL_DIR)
+
+install(EXPORT AntTweakBarTargets
+		DESTINATION ${ATB_CMAKE_PACKAGE_INSTALL_DIR})
+install(FILES "${CMAKE_SOURCE_DIR}/scripts/AntTweakBarConfig.cmake"
+		DESTINATION ${ATB_CMAKE_PACKAGE_INSTALL_DIR})
