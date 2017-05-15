@@ -23,10 +23,13 @@ ITwGraph* ITwGraph::Create(IUnknown* _D3DDevice)
 {
 #if !defined ANT_TW_NO_CORE_GL
 	if ( _D3DDevice == NULL )
-		return CreateForAPI(TW_OPENGL_CORE);
+	{
+		ITwGraph* result = CreateForAPI(TW_OPENGL_CORE);
+		if ( result != 0l ) return result;
+	}
 #elif !defined ANT_TW_NO_LEGACY_GL
 	if ( _D3DDevice == NULL )
-		return CreateForAPI(TW_OPENGL_CORE);
+		return CreateForAPI(TW_OPENGL);
 #endif
 	void* dev = NULL;
 #if !defined ANT_TW_NO_D3D11
