@@ -23,27 +23,6 @@
 #	define _CRT_SECURE_NO_DEPRECATE // visual 8 secure crt warning
 #endif
 
-#include <cstdio>
-#include <cassert>
-#include <cmath>
-#include <cfloat>
-#include <cstring>
-#include <cstdlib>
-#include <memory.h>
-
-#if defined(_MSC_VER) && _MSC_VER<=1200
-#	pragma warning(push, 3)
-#endif
-#include <string>
-#include <sstream>
-#include <vector>
-#include <map>
-#include <list>
-#include <set>
-#if defined(_MSC_VER) && _MSC_VER<=1200
-#	pragma warning(pop)
-#endif
-
 #if defined(_WINDOWS) || defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 #	define ANT_WINDOWS
 #	ifndef WIN32_LEAN_AND_MEAN
@@ -92,6 +71,27 @@
 
 #if !defined(NDEBUG) && !defined(_DEBUG)
 #	define _DEBUG
+#endif
+
+#include <cstdio>
+#include <cassert>
+#include <cmath>
+#include <cfloat>
+#include <cstring>
+#include <cstdlib>
+#include <memory.h>
+
+#if defined(_MSC_VER) && _MSC_VER<=1200
+#	pragma warning(push, 3)
+#endif
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <list>
+#include <set>
+#if defined(_MSC_VER) && _MSC_VER<=1200
+#	pragma warning(pop)
 #endif
 
 #endif	// !defined ANT_TW_PRECOMP_INCLUDED
