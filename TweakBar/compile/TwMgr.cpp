@@ -1854,13 +1854,18 @@ int ANT_CALL TwInit(ETwGraphAPI _GraphAPI, void *_Device)
 	g_TwMgr = g_TwMasterMgr;
 
 	TwGenerateDefaultFonts(g_FontScaling);
-	g_TwMgr->m_CurrentFont = g_DefaultNormalFont;
+	g_TwMasterMgr->m_CurrentFont = g_DefaultNormalFont;
 
 	int Res = 0;
-	g_TwMgr->m_Graph = ITwGraph::CreateForAPI(_GraphAPI, _Device);
-	if( g_TwMgr != NULL )
+	ITwGraph* renderer = ITwGraph::CreateForAPI(_GraphAPI, _Device);
+
+	if( renderer != NULL )
+	{
+		g_TwMasterMgr->m_Graph = renderer;
 		Res = TwInitMgr();
-	else
+	}
+
+	if ( ! Res )
 	{
 		g_TwMasterMgr->SetLastError(ITwGraph::GetErrorState());
 		TwTerminate();
