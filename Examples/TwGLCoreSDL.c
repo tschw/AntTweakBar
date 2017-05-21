@@ -27,32 +27,27 @@
 #include <stdlib.h>
 #include <math.h>
 
-
-
 // #define USE_OPENGL_ES 2
 // #define USE_OPENGL_ES 3
-
 
 // In this example, we draw a simple rotating square using the OpenGL core profile
 // (which requires much more code than with the compatibility profile).
 // A tweak bar is created to allow the user to change the color of the
 // rectangle and see its rotation.
 
-// Part of OpenGL core interface is not directly accessible from the common
-// OpenGL header and library (at least on windows) so we have to retrieve the
-// core functions using glGetProcAddress. These functions are prefixed by
-// underscore to avoid possible confict if a modified gl.h has been installed.
+// We have to retrieve the core functions using SDL_GL_GetProcAddress.
+// These functions are prefixed by underscore to avoid possible confict
+// if a modified gl.h has been installed.
 
-#ifdef _WIN32
-#	define glGetProcAddress wglGetProcAddress
-#else
-#	define GLX_GLXEXT_LEGACY
-#	include <GL/glx.h>
-#	define glGetProcAddress glXGetProcAddressARB
-#endif
 #ifndef APIENTRY
 #	define APIENTRY
 #endif
+typedef void (APIENTRY *PFNGLClear)(GLbitfield mask);
+typedef void (APIENTRY *PFNGLClearColor)(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+typedef void (APIENTRY *PFNGLDisable)(GLenum cap);
+typedef void (APIENTRY *PFNGLDrawArrays)(GLenum mode, GLint first, GLsizei count);
+typedef GLenum (APIENTRY *PFNGLGetError)(void);
+typedef void (APIENTRY *PFNGLViewport)(GLint x, GLint y, GLsizei width, GLsizei height);
 typedef GLuint (APIENTRY *PFNGLCreateShader)(GLenum type);
 typedef void (APIENTRY *PFNGLDeleteShader)(GLuint shader);
 typedef void (APIENTRY *PFNGLShaderSource)(GLuint shader, GLsizei count, const char* *str, const GLint *length);
@@ -75,6 +70,12 @@ typedef void (APIENTRY *PFNGLUniform1f)(GLint location, GLfloat v0);
 typedef void (APIENTRY *PFNGLUniform3f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
 typedef void (APIENTRY *PFNGLBufferData)(GLenum target, ptrdiff_t size, const GLvoid *data, GLenum usage);
 typedef void (APIENTRY *PFNGLDeleteBuffers)(GLsizei n, const GLuint *buffers);
+PFNGLClear _glClear;
+PFNGLClearColor _glClearColor;
+PFNGLDisable _glDisable;
+PFNGLDrawArrays _glDrawArrays;
+PFNGLGetError _glGetError;
+PFNGLViewport _glViewport;
 PFNGLCreateShader _glCreateShader;
 PFNGLDeleteShader _glDeleteShader;
 PFNGLShaderSource _glShaderSource;
@@ -112,28 +113,34 @@ PFNGLDeleteBuffers _glDeleteBuffers;
 
 int LoadGLCoreFunctions()
 {
-	_glCreateShader = (PFNGLCreateShader)glGetProcAddress("glCreateShader");
-	_glDeleteShader = (PFNGLDeleteShader)glGetProcAddress("glDeleteShader");
-	_glShaderSource = (PFNGLShaderSource)glGetProcAddress("glShaderSource");
-	_glCompileShader = (PFNGLCompileShader)glGetProcAddress("glCompileShader");
-	_glAttachShader = (PFNGLAttachShader)glGetProcAddress("glAttachShader");
-	_glCreateProgram = (PFNGLCreateProgram)glGetProcAddress("glCreateProgram");
-	_glLinkProgram = (PFNGLLinkProgram)glGetProcAddress("glLinkProgram");
-	_glUseProgram = (PFNGLUseProgram)glGetProcAddress("glUseProgram");
-	_glDeleteProgram = (PFNGLDeleteProgram)glGetProcAddress("glDeleteProgram");
-	_glGenBuffers = (PFNGLGenBuffers)glGetProcAddress("glGenBuffers");
-	_glBindBuffer = (PFNGLBindBuffer)glGetProcAddress("glBindBuffer");
-	_glVertexAttribPointer = (PFNGLVertexAttribPointer)glGetProcAddress("glVertexAttribPointer");
-	_glEnableVertexAttribArray = (PFNGLEnableVertexAttribArray)glGetProcAddress("glEnableVertexAttribArray");
-	_glGenVertexArrays = (PFNGLGenVertexArrays)glGetProcAddress("glGenVertexArrays");
-	_glBindVertexArray = (PFNGLBindVertexArray)glGetProcAddress("glBindVertexArray");
-	_glDeleteVertexArrays = (PFNGLDeleteVertexArrays)glGetProcAddress("glDeleteVertexArrays");
-	_glGetAttribLocation = (PFNGLGetAttribLocation)glGetProcAddress("glGetAttribLocation");
-	_glGetUniformLocation = (PFNGLGetUniformLocation)glGetProcAddress("glGetUniformLocation");
-	_glUniform1f = (PFNGLUniform1f)glGetProcAddress("glUniform1f");
-	_glUniform3f = (PFNGLUniform3f)glGetProcAddress("glUniform3f");
-	_glBufferData = (PFNGLBufferData)glGetProcAddress("glBufferData");
-	_glDeleteBuffers = (PFNGLDeleteBuffers)glGetProcAddress("glDeleteBuffers");
+	_glClear = (PFNGLClear)SDL_GL_GetProcAddress("glClear");
+	_glClearColor = (PFNGLClearColor)SDL_GL_GetProcAddress("glClearColor");
+	_glDisable = (PFNGLDisable)SDL_GL_GetProcAddress("glDisable");
+	_glDrawArrays = (PFNGLDrawArrays)SDL_GL_GetProcAddress("glDrawArrays");
+	_glGetError = (PFNGLGetError)SDL_GL_GetProcAddress("glGetError");
+	_glViewport = (PFNGLViewport)SDL_GL_GetProcAddress("glViewport");
+	_glCreateShader = (PFNGLCreateShader)SDL_GL_GetProcAddress("glCreateShader");
+	_glDeleteShader = (PFNGLDeleteShader)SDL_GL_GetProcAddress("glDeleteShader");
+	_glShaderSource = (PFNGLShaderSource)SDL_GL_GetProcAddress("glShaderSource");
+	_glCompileShader = (PFNGLCompileShader)SDL_GL_GetProcAddress("glCompileShader");
+	_glAttachShader = (PFNGLAttachShader)SDL_GL_GetProcAddress("glAttachShader");
+	_glCreateProgram = (PFNGLCreateProgram)SDL_GL_GetProcAddress("glCreateProgram");
+	_glLinkProgram = (PFNGLLinkProgram)SDL_GL_GetProcAddress("glLinkProgram");
+	_glUseProgram = (PFNGLUseProgram)SDL_GL_GetProcAddress("glUseProgram");
+	_glDeleteProgram = (PFNGLDeleteProgram)SDL_GL_GetProcAddress("glDeleteProgram");
+	_glGenBuffers = (PFNGLGenBuffers)SDL_GL_GetProcAddress("glGenBuffers");
+	_glBindBuffer = (PFNGLBindBuffer)SDL_GL_GetProcAddress("glBindBuffer");
+	_glVertexAttribPointer = (PFNGLVertexAttribPointer)SDL_GL_GetProcAddress("glVertexAttribPointer");
+	_glEnableVertexAttribArray = (PFNGLEnableVertexAttribArray)SDL_GL_GetProcAddress("glEnableVertexAttribArray");
+	_glGenVertexArrays = (PFNGLGenVertexArrays)SDL_GL_GetProcAddress("glGenVertexArrays");
+	_glBindVertexArray = (PFNGLBindVertexArray)SDL_GL_GetProcAddress("glBindVertexArray");
+	_glDeleteVertexArrays = (PFNGLDeleteVertexArrays)SDL_GL_GetProcAddress("glDeleteVertexArrays");
+	_glGetAttribLocation = (PFNGLGetAttribLocation)SDL_GL_GetProcAddress("glGetAttribLocation");
+	_glGetUniformLocation = (PFNGLGetUniformLocation)SDL_GL_GetProcAddress("glGetUniformLocation");
+	_glUniform1f = (PFNGLUniform1f)SDL_GL_GetProcAddress("glUniform1f");
+	_glUniform3f = (PFNGLUniform3f)SDL_GL_GetProcAddress("glUniform3f");
+	_glBufferData = (PFNGLBufferData)SDL_GL_GetProcAddress("glBufferData");
+	_glDeleteBuffers = (PFNGLDeleteBuffers)SDL_GL_GetProcAddress("glDeleteBuffers");
 
 	if (_glCreateShader == NULL || _glDeleteShader == NULL || _glShaderSource == NULL || _glCompileShader == NULL
 		|| _glAttachShader == NULL || _glCreateProgram == NULL || _glLinkProgram == NULL || _glUseProgram  == NULL
@@ -149,7 +156,7 @@ int LoadGLCoreFunctions()
 void checkGlError()
 {
 	GLenum error;
-	if ((error = glGetError()) != GL_NO_ERROR)
+	if ((error = _glGetError()) != GL_NO_ERROR)
 		fprintf(stderr, "GL error detected: 0x%04X\n", error);
 }
 
@@ -236,8 +243,8 @@ void InitRender()
 	_glEnableVertexAttribArray(vlocation);
 
 	// GL states
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	_glDisable(GL_DEPTH_TEST);
+	_glDisable(GL_CULL_FACE);
 
 	checkGlError();
 }
@@ -257,7 +264,7 @@ void Render()
 	_glUniform1f(sina, (float)sin(angle));
 	_glUniform3f(colorloc, color[0], color[1], color[2]);
 	_glBindVertexArray(varray);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	_glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	checkGlError();
 }
@@ -309,14 +316,11 @@ int main( int argc, char* argv[] )
 	SDL_GL_SetAttribute(
 			SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 #	else
-	// Request GL context to be OpenGL 3.2 Core Profile
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, USE_OPENGL_ES);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	SDL_GL_SetAttribute(
 			SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-
 #	endif
-
 
 #endif
 
@@ -329,7 +333,7 @@ int main( int argc, char* argv[] )
 
 #if SDL_MAJOR_VERSION >= 2
 
-	window = SDL_CreateWindow("AntTweakBar+GLCore+SDL",
+	window = SDL_CreateWindow("AntTweakBar+GLCore+SDL2",
 				SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
 				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |SDL_WINDOW_RESIZABLE);
 	if (!window)
@@ -391,7 +395,7 @@ int main( int argc, char* argv[] )
 	CreateTweakBar();
 
 	// Set OpenGL viewport
-	glViewport(0, 0, width, height);
+	_glViewport(0, 0, width, height);
 
 	// Prepare GL shaders and programs for drawing
 	InitRender();
@@ -405,8 +409,8 @@ int main( int argc, char* argv[] )
 		int handled;
 
 		// Clear screen
-		glClearColor(0.5f, 0.75f, 0.8f, 1);
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		_glClearColor(0.5f, 0.75f, 0.8f, 1);
+		_glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		// Update angle and draw geometry
 		angle = (float)SDL_GetTicks()/25.0f * (FLOAT_PI/180.0f);
@@ -455,7 +459,7 @@ int main( int argc, char* argv[] )
 #endif
 
 					// Resize OpenGL viewport
-					glViewport(0, 0, width, height);
+					_glViewport(0, 0, width, height);
 
 					// Restore OpenGL states
 					InitRender();
