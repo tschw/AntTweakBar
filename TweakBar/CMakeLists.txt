@@ -99,24 +99,40 @@ target_include_directories(AntTweakBar
 		compile
 		${CMAKE_CURRENT_BINARY_DIR})
 
-set(defs PRIVATE TW_EXPORTS)
-
-if (WIN32)
-	# Don't bake library names into client code (no need for that using CMake)
-	set(defs INTERFACE TW_NO_LIB_PRAGMA ${defs})
-endif()
-
-if (NOT BUILD_SHARED_LIBS)
-	list(APPEND defs TW_STATIC)
-elseif (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
-	set_target_properties(${PROJECT_NAME}
-		PROPERTIES OUTPUT_NAME "${PROJECT_NAME}64")
-endif()
-
 if ((UNIX AND NOT APPLE) OR ATB_EVENT_HANDLER_X11)
 	find_package(X11 REQUIRED)
 	target_link_libraries(AntTweakBar PRIVATE ${X11_LIBRARIES})
 endif()
+
+set(defs "INTERFACE")
+
+if (NOT BUILD_SHARED_LIBS)
+
+	list(APPEND defs TW_STATIC)
+endif()
+
+if (WIN32)
+
+	# No MSVC auto linking via '#pragma lib' for CMake builds
+	list(APPEND defs TW_NO_LIB_PRAGMA)
+
+	# However, use suitable DLL name, so it can work in non-CMake builds
+
+	set(dllname "${PROJECT_NAME}")
+
+	if (NOT BUILD_SHARED_LIBS)
+		set(dllname "${dllname}Static")
+	endif()
+
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(dllname "${dllname}64")
+	endif()
+
+	set_target_properties(${PROJECT_NAME}
+			PROPERTIES OUTPUT_NAME "${dllname}")
+endif()
+
+list(APPEND defs PRIVATE TW_EXPORTS)
 
 append_unless(defs	TW_NO_WINDOWS_EVENTS			ATB_EVENT_HANDLER_WINDOWS)
 append_unless(defs	TW_NO_X11_EVENTS				ATB_EVENT_HANDLER_X11)
