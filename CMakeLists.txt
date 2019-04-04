@@ -12,6 +12,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 include(D3DShader)
 include(Functions)
 
+if (APPLE)
+	set(CMAKE_MACOSX_RPATH ON)
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -xobjective-c++)
+endif()
+
 add_subdirectory(Renderer)
 add_subdirectory(TweakBar)
 

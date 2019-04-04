@@ -30,12 +30,13 @@
 #	include <windows.h>
 #	include <shellapi.h>
 #	define ANT_WINDOWS
-#elif defined(_MACOSX)
+#elif defined(__APPLE__)
 #	include <unistd.h>
 #	include <Foundation/Foundation.h>
-#	include <AppKit/NSImage.h>
-#	include <AppKit/NSCursor.h>
 #	define ANT_OSX
+#	ifndef _MACOSX
+#		define _MACOSX
+#	endif
 #	undef _WIN32
 #	undef WIN32
 #	undef _WIN64

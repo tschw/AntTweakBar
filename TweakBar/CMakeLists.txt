@@ -104,6 +104,10 @@ if ((UNIX AND NOT APPLE) OR ATB_EVENT_HANDLER_X11)
 	target_link_libraries(AntTweakBar PRIVATE ${X11_LIBRARIES})
 endif()
 
+if (APPLE)
+	target_link_libraries(AntTweakBar PRIVATE "-framework AppKit")
+endif()
+
 set(defs "INTERFACE")
 
 if (NOT BUILD_SHARED_LIBS)

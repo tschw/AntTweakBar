@@ -22,6 +22,9 @@
 #include "TwGraph.h"
 #include "AntPerfTimer.h"
 
+#ifdef ANT_OSX
+#	include <AppKit/NSCursor.h>
+#endif
 
 //#define BENCH // uncomment to activate benchmarks
 

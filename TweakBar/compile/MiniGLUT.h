@@ -30,7 +30,7 @@
 #	define GLUT_API		 extern
 #endif
 
-#if defined(_MACOSX)
+#if defined(__APPLE__)
 #	include <OpenGL/gl.h>
 #	include <OpenGL/glu.h>
 #else

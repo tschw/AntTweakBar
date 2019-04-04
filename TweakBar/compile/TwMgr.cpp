@@ -18,12 +18,13 @@
 #	ifdef _DEBUG
 #		include <crtdbg.h>
 #	endif // _DEBUG
-#endif // ANT_WINDOWS
-
-#if !defined(ANT_WINDOWS)
+#else
 #	define _snprintf snprintf
-#endif	// defined(ANT_WINDOWS)
+#endif
 
+#ifdef ANT_OSX
+#	include <AppKit/NSImage.h>
+#endif
 
 using namespace std;
 

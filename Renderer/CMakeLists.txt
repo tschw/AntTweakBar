@@ -81,7 +81,13 @@ target_include_directories(${target}
 )
 
 if (NOT WIN32)
-	find_package(OpenGL REQUIRED)
+
+	if (NOT APPLE)
+		find_package(OpenGL REQUIRED)
+	else()
+		set(OPENGL_LIBRARIES "-framework Foundation" "-framework OpenGL")
+	endif()
+
 	target_link_libraries(${target} PRIVATE ${OPENGL_LIBRARIES})
 
 elseif (CMAKE_SIZEOF_VOID_P EQUAL 8)

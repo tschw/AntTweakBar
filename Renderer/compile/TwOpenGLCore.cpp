@@ -16,7 +16,7 @@
 #define ANT_OGL_HEADER_INCLUDED ////
 */
 
-#if defined ANT_OSX
+#if defined __APPLE__
 #	include <OpenGL/gl3.h>
 #	define ANT_OGL_HEADER_INCLUDED
 #endif
@@ -96,7 +96,7 @@ static GLuint CreateShader(GLchar const* source, GLenum type, bool useGlES)
 	GLuint shader = _glCreateShader(type);
 
 	char const* sourceStrings[5];
-	sourceStrings[0] = useGlES ? "#version 300 es\n" : "#version 130\n";
+	sourceStrings[0] = useGlES ? "#version 300 es\n" : "#version 140\n";
 	sourceStrings[1] =
 			"#if __VERSION__ >= 130\n"
 

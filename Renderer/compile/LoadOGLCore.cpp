@@ -485,7 +485,7 @@ namespace GLCore { PFNGLGetProcAddress _glGetProcAddress = NULL; }
 		void *proc=NULL;
 		if (gl_dyld == NULL)
 		{
-			gl_dyld = dlopen("OpenGL",RTLD_LAZY);
+			gl_dyld = dlopen("/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL", RTLD_LAZY);
 		}
 		if (gl_dyld)
 		{
