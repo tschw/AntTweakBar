@@ -5,6 +5,8 @@ project(AntTweakBar)
 
 option(ATB_BUILD_EXAMPLES "Whether to build example programs" OFF)
 
+include(GNUInstallDirs)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 
 include(D3DShader)
