@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
+option(BUILD_SHARED_LIBS "Whether to build a shared library" ON)
 
 project(AntTweakBar)
 
