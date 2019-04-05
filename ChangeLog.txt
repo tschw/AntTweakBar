@@ -1,5 +1,16 @@
 --- AntTweakBar library change log ---
 
+* Latest (https://github.com/tschw/AntTweakBar)
+
+  - Added top-level namespace for internal symbols for happy static linking
+  - Switched to CMake-based build system adding lots of customizability
+  - Added support for OpenGL ES 2+ core profiles
+  - Fixed core GL texture state save/restore issue
+  - Fixed memory access after free with popup windows
+  - Implemented auto-detection of D3D device version
+  - Added support for GLFW3 event handlers (contributed by Joachim Fenkes)
+  - Added support for SDL2 event handlers (contributed Arne Döring)
+
 * Version 1.16 (2013/03/21)
 
   -	Moved AntTweakBar documentation to sourceforge, available at:
