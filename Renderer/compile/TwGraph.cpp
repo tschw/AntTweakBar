@@ -17,6 +17,8 @@
 #endif
 #include "../../TweakBar/include/AntTweakBar.h"
 
+namespace AntTweakBar {
+
 char const* ITwGraph::g_ErrorState = NULL;
 
 ITwGraph* ITwGraph::Create(IUnknown* _D3DDevice)
@@ -112,3 +114,4 @@ ITwGraph::~ITwGraph()
 {
 }
 
+} // namespace

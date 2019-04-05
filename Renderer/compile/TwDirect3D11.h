@@ -17,6 +17,22 @@
 
 #include "TwGraph.h"
 
+struct ID3D11Device;
+struct ID3D11DeviceContext;
+struct ID3D11Texture2D;
+struct ID3D11ShaderResourceView;
+struct ID3D11DepthStencilState;
+struct ID3D11BlendState;
+struct ID3D11RasterizerState;
+struct ID3D11PixelShader;
+struct ID3D11VertexShader;
+struct ID3D11InputLayout;
+struct ID3D11Buffer;
+struct ID3D11SamplerState;
+
+
+namespace AntTweakBar {
+
 //	---------------------------------------------------------------------------
 
 class CTwGraphDirect3D11 : public ITwGraph
@@ -48,13 +64,13 @@ public:
 	virtual void				SetScissor(int _X0, int _Y0, int _Width, int _Height);
 
 protected:
-	struct ID3D11Device *		m_D3DDev;
-	struct ID3D11DeviceContext *m_D3DDevImmContext;
+	ID3D11Device *				m_D3DDev;
+	ID3D11DeviceContext *		m_D3DDevImmContext;
 	unsigned int				m_D3DDevInitialRefCount;
 	bool						m_Drawing;
 	const CTexFont *			m_FontTex;
-	struct ID3D11Texture2D *	m_FontD3DTex;
-	struct ID3D11ShaderResourceView *m_FontD3DTexRV;
+	ID3D11Texture2D *			m_FontD3DTex;
+	ID3D11ShaderResourceView *	m_FontD3DTexRV;
 	int							m_WndWidth;
 	int							m_WndHeight;
 	int							m_OffsetX;
@@ -91,32 +107,32 @@ protected:
 		bool					m_LineBgColors;
 	};
 
-	struct CState11 *				m_State;
-	struct ID3D11DepthStencilState *m_DepthStencilState;
-	struct ID3D11BlendState *		m_BlendState;
-	struct ID3D11RasterizerState *	m_RasterState;
-	struct ID3D11RasterizerState *	m_RasterStateAntialiased;
-	struct ID3D11RasterizerState *	m_RasterStateMultisample;
-	struct ID3D11RasterizerState *	m_RasterStateCullCW;
-	struct ID3D11RasterizerState *	m_RasterStateCullCCW;
+	struct CState11 *			m_State;
+	ID3D11DepthStencilState *	m_DepthStencilState;
+	ID3D11BlendState *			m_BlendState;
+	ID3D11RasterizerState *		m_RasterState;
+	ID3D11RasterizerState *		m_RasterStateAntialiased;
+	ID3D11RasterizerState *		m_RasterStateMultisample;
+	ID3D11RasterizerState *		m_RasterStateCullCW;
+	ID3D11RasterizerState *		m_RasterStateCullCCW;
 
-	struct ID3D11VertexShader *		m_LineRectVS;
-	struct ID3D11VertexShader *		m_LineRectCstColorVS;
-	struct ID3D11PixelShader *		m_LineRectPS;
-	struct ID3D11InputLayout *		m_LineRectVertexLayout;
-	struct ID3D11VertexShader *		m_TextVS;
-	struct ID3D11VertexShader *		m_TextCstColorVS;
-	struct ID3D11PixelShader *		m_TextPS;
-	struct ID3D11InputLayout *		m_TextVertexLayout;
-	struct ID3D11Buffer *			m_LineVertexBuffer;
-	struct ID3D11Buffer *			m_RectVertexBuffer;
-	struct ID3D11Buffer *			m_TrianglesVertexBuffer;
-	int								m_TrianglesVertexBufferCount;
-	struct ID3D11Buffer *			m_ConstantBuffer;
-	struct ID3D11SamplerState *		m_SamplerState;
+	ID3D11VertexShader *		m_LineRectVS;
+	ID3D11VertexShader *		m_LineRectCstColorVS;
+	ID3D11PixelShader *			m_LineRectPS;
+	ID3D11InputLayout *			m_LineRectVertexLayout;
+	ID3D11VertexShader *		m_TextVS;
+	ID3D11VertexShader *		m_TextCstColorVS;
+	ID3D11PixelShader *			m_TextPS;
+	ID3D11InputLayout *			m_TextVertexLayout;
+	ID3D11Buffer *				m_LineVertexBuffer;
+	ID3D11Buffer *				m_RectVertexBuffer;
+	ID3D11Buffer *				m_TrianglesVertexBuffer;
+	int							m_TrianglesVertexBufferCount;
+	ID3D11Buffer *				m_ConstantBuffer;
+	ID3D11SamplerState *		m_SamplerState;
 };
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_D3D11
 #endif // !defined ANT_TW_DIRECT3D11_INCLUDED

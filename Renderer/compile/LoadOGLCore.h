@@ -14,6 +14,7 @@
 #if !defined ANT_LOAD_OGL_CORE_INCLUDED
 #define ANT_LOAD_OGL_CORE_INCLUDED
 
+namespace AntTweakBar {
 
 #define ANT_GL_CORE_DECL_NO_FORWARD(_Ret, _Fct, _Params) \
 	extern "C" { typedef _Ret (APIENTRY* PFN##_Fct)_Params; } \
@@ -421,4 +422,6 @@ ANT_GL_CORE_DECL(PROC, wglGetProcAddress, (LPCSTR))
 #ifndef GL_BLEND_SRC_ALPHA
 #	define GL_BLEND_SRC_ALPHA                0x80CB
 #endif
+
+}
 #endif // !defined ANT_LOAD_OGL_CORE_INCLUDED

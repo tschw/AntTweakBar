@@ -42,6 +42,10 @@
 #endif
 #endif
 
+namespace AntTweakBar {
+
+struct CTwBar;
+
 const int NB_ROTO_CURSORS = 12;
 
 
@@ -102,14 +106,14 @@ struct CTwMgr
 	int					m_WndHeight;
 	const CTexFont *	m_CurrentFont;
 
-	std::vector<TwBar*> m_Bars;
+	std::vector<CTwBar*> m_Bars;
 	std::vector<int>	m_Order;
 
 	std::vector<bool>	m_MinOccupied;
-	void				Minimize(TwBar *_Bar);
-	void				Maximize(TwBar *_Bar);
-	void				Hide(TwBar *_Bar);
-	void				Unhide(TwBar *_Bar);
+	void				Minimize(CTwBar *_Bar);
+	void				Maximize(CTwBar *_Bar);
+	void				Hide(CTwBar *_Bar);
+	void				Unhide(CTwBar *_Bar);
 	void				SetFont(const CTexFont *_Font, bool _ResizeBars);
 	int					m_LastMouseX;
 	int					m_LastMouseY;
@@ -127,7 +131,7 @@ struct CTwMgr
 	bool				m_Terminating;
 
 	std::string			m_Help;
-	TwBar *				m_HelpBar;
+	CTwBar *			m_HelpBar;
 	float				m_LastHelpUpdateTime;
 	void				UpdateHelpBar();
 	bool				m_HelpBarNotUpToDate;
@@ -147,7 +151,7 @@ struct CTwMgr
 	const char *		GetLastError();									// returns a static string describing the error, and set LastError to NULL
 	const char *		CheckLastError() const;							// returns the LastError, but does not set it to NULL
 	void				SetCurrentDbgParams(const char *file, int line);
-	TwBar *				m_PopupBar;
+	CTwBar *			m_PopupBar;
 	//bool				IsProcessing() const			{ return m_Processing);
 	//void				SetProcessing(bool processing)	{ m_Processing = processing; }
 
@@ -523,6 +527,5 @@ private:
 };
 
 //	---------------------------------------------------------------------------
-
-
+}
 #endif // !defined ANT_TW_MGR_INCLUDED

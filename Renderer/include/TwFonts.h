@@ -13,6 +13,7 @@
 
 #if !defined ANT_TW_FONTS_INCLUDED
 #define ANT_TW_FONTS_INCLUDED
+namespace AntTweakBar {
 
 /*
 A source bitmap includes 224 characters starting from ascii char 32 (i.e. space)
@@ -62,5 +63,5 @@ extern CTexFont *g_DefaultFixedRuFont;
 void TwGenerateDefaultFonts(float _Scaling=1.0f, bool _forD3D=false);
 void TwDeleteDefaultFonts();
 
-
+}
 #endif	// !defined ANT_TW_FONTS_INCLUDED

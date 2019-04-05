@@ -12,6 +12,7 @@
 #include "TwPrecomp.h"
 #include "LoadOGL.h"
 
+namespace AntTweakBar {
 
 //	---------------------------------------------------------------------------
 
@@ -544,5 +545,5 @@ namespace GL { PFNGLGetProcAddress _glGetProcAddress = NULL; }
 #endif // defined(ANT_UNIX)
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_LEGACY_GL

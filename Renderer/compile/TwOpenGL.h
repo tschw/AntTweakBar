@@ -19,6 +19,8 @@
 #include "TwPrecomp.h"
 #include "TwGraph.h"
 
+namespace AntTweakBar {
+
 //	---------------------------------------------------------------------------
 
 class CTwGraphOpenGL : public ITwGraph
@@ -96,6 +98,6 @@ protected:
 };
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_LEGACY_GL
 #endif // !defined ANT_TW_OPENGL_INCLUDED

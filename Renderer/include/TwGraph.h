@@ -17,13 +17,15 @@
 
 #include <string>
 
-//	---------------------------------------------------------------------------
-
 #ifdef DrawText		// DirectX redefines 'DrawText' !!
 #	undef DrawText
 #endif	// DrawText
 
 struct IUnknown;
+
+namespace AntTweakBar {
+
+//	---------------------------------------------------------------------------
 
 class ITwGraph
 {
@@ -71,5 +73,5 @@ protected:
 };
 
 //	---------------------------------------------------------------------------
-
+}
 #endif	// ANT_TW_GRAPH_INCLUDED

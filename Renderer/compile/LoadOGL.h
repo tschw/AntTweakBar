@@ -13,7 +13,7 @@
 
 #if !defined ANT_LOAD_OGL_INCLUDED
 #define ANT_LOAD_OGL_INCLUDED
-
+namespace AntTweakBar {
 
 #define ANT_GL_DECL(_Ret, _Fct, _Params) \
 	extern "C" { typedef _Ret (APIENTRY* PFN##_Fct)_Params; } \
@@ -393,5 +393,5 @@ ANT_GL_DECL(void, glViewport, (GLint x, GLint y, GLsizei width, GLsizei height))
 ANT_GL_DECL(PROC, wglGetProcAddress, (LPCSTR))
 #endif
 
-
+}
 #endif // !defined ANT_LOAD_OGL_INCLUDED

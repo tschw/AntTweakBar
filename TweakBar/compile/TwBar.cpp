@@ -14,6 +14,8 @@
 #include "TwBar.h"
 #include "TwColors.h"
 
+namespace AntTweakBar {
+
 using namespace std;
 
 extern const char *g_ErrNotFound;
@@ -995,7 +997,7 @@ int CTwVar::HasAttrib(const char *_Attrib, bool *_HasValue) const
 	return 0; // not found
 }
 
-int CTwVar::SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex)
+int CTwVar::SetAttrib(int _AttribID, const char *_Value, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex)
 {
 	switch( _AttribID )
 	{
@@ -1199,7 +1201,7 @@ int CTwVar::SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct CTw
 }
 
 
-ERetType CTwVar::GetAttrib(int _AttribID, TwBar * /*_Bar*/, CTwVarGroup * _VarParent, int /*_VarIndex*/, std::vector<double>& outDoubles, std::ostringstream& outString) const
+ERetType CTwVar::GetAttrib(int _AttribID, CTwBar * /*_Bar*/, CTwVarGroup * _VarParent, int /*_VarIndex*/, std::vector<double>& outDoubles, std::ostringstream& outString) const
 {
 	outDoubles.clear();
 	outString.clear();
@@ -1282,7 +1284,7 @@ int CTwVarAtom::HasAttrib(const char *_Attrib, bool *_HasValue) const
 	return CTwVar::HasAttrib(_Attrib, _HasValue);
 }
 
-int CTwVarAtom::SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex)
+int CTwVarAtom::SetAttrib(int _AttribID, const char *_Value, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex)
 {
 	switch( _AttribID )
 	{
@@ -1651,7 +1653,7 @@ int CTwVarAtom::SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct
 	}
 }
 
-ERetType CTwVarAtom::GetAttrib(int _AttribID, TwBar *_Bar, CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDoubles, std::ostringstream& outString) const
+ERetType CTwVarAtom::GetAttrib(int _AttribID, CTwBar *_Bar, CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDoubles, std::ostringstream& outString) const
 {
 	outDoubles.clear();
 	outString.clear();
@@ -2473,7 +2475,7 @@ int CTwVarGroup::HasAttrib(const char *_Attrib, bool *_HasValue) const
 	return CTwVar::HasAttrib(_Attrib, _HasValue);
 }
 
-int CTwVarGroup::SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex)
+int CTwVarGroup::SetAttrib(int _AttribID, const char *_Value, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex)
 {
 	switch( _AttribID )
 	{
@@ -2756,7 +2758,7 @@ int CTwVarGroup::SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struc
 	}
 }
 
-ERetType CTwVarGroup::GetAttrib(int _AttribID, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDoubles, std::ostringstream& outString) const
+ERetType CTwVarGroup::GetAttrib(int _AttribID, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDoubles, std::ostringstream& outString) const
 {
 	outDoubles.clear();
 	outString.clear();
@@ -5468,7 +5470,7 @@ void CTwBar::Draw(int _DrawPart)
 
 //	---------------------------------------------------------------------------
 
-void TwBar::CheckScrollbar(int NbHierLinesDelta)
+void CTwBar::CheckScrollbar(int NbHierLinesDelta)
 {
 	if( m_FirstLine>m_NbHierLines+NbHierLinesDelta-m_NbDisplayedLines )
 		m_FirstLine = m_NbHierLines+NbHierLinesDelta-m_NbDisplayedLines;
@@ -6118,7 +6120,7 @@ bool CTwBar::MouseButton(ETwMouseButtonID _Button, bool _Pressed, int _X, int _Y
 					}
 					// popup list
 					CTwMgr::CEnum& e = g_TwMgr->m_Enums[Var->m_Type-TW_TYPE_ENUM_BASE];
-					g_TwMgr->m_PopupBar = TwNewBar("~ Enum Popup ~");
+					g_TwMgr->m_PopupBar = static_cast<CTwBar*>(TwNewBar("~ Enum Popup ~"));
 					g_TwMgr->m_PopupBar->m_IsPopupList = true;
 					g_TwMgr->m_PopupBar->m_Color = m_Color;
 					g_TwMgr->m_PopupBar->m_DarkText = m_DarkText;
@@ -7778,4 +7780,5 @@ bool CTwBar::EditInPlaceSetClipboard(const std::string& _String)
 
 //	---------------------------------------------------------------------------
 
+}
 

@@ -18,6 +18,11 @@
 
 #include "TwGraph.h"
 
+struct IDirect3DDevice9;
+struct IDirect3DTexture9;
+
+namespace AntTweakBar {
+
 //	---------------------------------------------------------------------------
 
 class CTwGraphDirect3D9 : public ITwGraph
@@ -48,10 +53,10 @@ public:
 	virtual void				SetScissor(int _X0, int _Y0, int _Width, int _Height);
 
 protected:
-	struct IDirect3DDevice9 *	m_D3DDev;
+	IDirect3DDevice9 *			m_D3DDev;
 	bool						m_Drawing;
 	const CTexFont *			m_FontTex;
-	struct IDirect3DTexture9 *	m_FontD3DTex;
+	IDirect3DTexture9 *			m_FontD3DTex;
 	bool						m_PureDevice;
 	int							m_WndWidth;
 	int							m_WndHeight;
@@ -90,6 +95,6 @@ protected:
 };
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_D3D9
 #endif // !defined ANT_TW_DIRECT3D9_INCLUDED

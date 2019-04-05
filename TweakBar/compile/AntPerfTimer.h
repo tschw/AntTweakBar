@@ -17,6 +17,7 @@
 #	error This is a C++ header
 #endif	// __cplusplus
 
+namespace AntTweakBar {
 
 #if defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 
@@ -52,5 +53,6 @@
 
 #endif // _WIN
 
+}
 
 #endif // ANT_PERF_TIMER_INCLUDED

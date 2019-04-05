@@ -12,6 +12,8 @@
 #include "TwPrecomp.h"
 #include "LoadOGLCore.h"
 
+namespace AntTweakBar {
+
 //	---------------------------------------------------------------------------
 
 #define ANT_NB_OGL_CORE_FUNC_MAX 512
@@ -538,5 +540,5 @@ namespace GLCore { PFNGLGetProcAddress _glGetProcAddress = NULL; }
 #endif
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_CORE_GL

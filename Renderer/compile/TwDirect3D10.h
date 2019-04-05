@@ -17,6 +17,20 @@
 
 #include "TwGraph.h"
 
+struct ID3D10Device;
+struct ID3D10ShaderResourceView;
+struct ID3D10DepthStencilState;
+struct ID3D10BlendState;
+struct ID3D10RasterizerState;
+struct ID3D10Effect;
+struct ID3D10EffectTechnique;
+struct ID3D10InputLayout;
+struct ID3D10Buffer;
+struct ID3D10EffectShaderResourceVariable;
+struct ID3D10EffectVectorVariable;
+
+namespace AntTweakBar {
+
 //	---------------------------------------------------------------------------
 
 class CTwGraphDirect3D10 : public ITwGraph
@@ -48,11 +62,11 @@ public:
 	virtual void				SetScissor(int _X0, int _Y0, int _Width, int _Height);
 
 protected:
-	struct ID3D10Device *		m_D3DDev;
+	ID3D10Device *				m_D3DDev;
 	unsigned int				m_D3DDevInitialRefCount;
 	bool						m_Drawing;
 	const CTexFont *			m_FontTex;
-	struct ID3D10ShaderResourceView *m_FontD3DTexRV;
+	ID3D10ShaderResourceView *	m_FontD3DTexRV;
 	int							m_WndWidth;
 	int							m_WndHeight;
 	int							m_OffsetX;
@@ -85,29 +99,29 @@ protected:
 	};
 
 	struct CState10 *				m_State;
-	struct ID3D10DepthStencilState *m_DepthStencilState;
-	struct ID3D10BlendState *		m_BlendState;
-	struct ID3D10RasterizerState *	m_RasterState;
-	struct ID3D10RasterizerState *	m_RasterStateAntialiased;
-	struct ID3D10RasterizerState *	m_RasterStateCullCW;
-	struct ID3D10RasterizerState *	m_RasterStateCullCCW;
-	struct ID3D10Effect *			m_Effect;
-	struct ID3D10EffectTechnique*	m_LineRectTech;
-	struct ID3D10EffectTechnique*	m_LineRectCstColorTech;
-	struct ID3D10InputLayout *		m_LineRectVertexLayout;
-	struct ID3D10Buffer *			m_LineVertexBuffer;
-	struct ID3D10Buffer *			m_RectVertexBuffer;
-	struct ID3D10Buffer *			m_TrianglesVertexBuffer;
+	ID3D10DepthStencilState *		m_DepthStencilState;
+	ID3D10BlendState *				m_BlendState;
+	ID3D10RasterizerState *			m_RasterState;
+	ID3D10RasterizerState *			m_RasterStateAntialiased;
+	ID3D10RasterizerState *			m_RasterStateCullCW;
+	ID3D10RasterizerState *			m_RasterStateCullCCW;
+	ID3D10Effect *					m_Effect;
+	ID3D10EffectTechnique*			m_LineRectTech;
+	ID3D10EffectTechnique*			m_LineRectCstColorTech;
+	ID3D10InputLayout *				m_LineRectVertexLayout;
+	ID3D10Buffer *					m_LineVertexBuffer;
+	ID3D10Buffer *					m_RectVertexBuffer;
+	ID3D10Buffer *					m_TrianglesVertexBuffer;
 	int								m_TrianglesVertexBufferCount;
-	struct ID3D10EffectTechnique*	m_TextTech;
-	struct ID3D10EffectTechnique*	m_TextCstColorTech;
-	struct ID3D10InputLayout *		m_TextVertexLayout;
-	struct ID3D10EffectShaderResourceVariable *m_FontD3DResVar;
-	struct ID3D10EffectVectorVariable *m_OffsetVar;
-	struct ID3D10EffectVectorVariable *m_CstColorVar;
+	ID3D10EffectTechnique*			m_TextTech;
+	ID3D10EffectTechnique*			m_TextCstColorTech;
+	ID3D10InputLayout *				m_TextVertexLayout;
+	ID3D10EffectShaderResourceVariable *m_FontD3DResVar;
+	ID3D10EffectVectorVariable *	m_OffsetVar;
+	ID3D10EffectVectorVariable *	m_CstColorVar;
 };
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_D3D10
 #endif // !defined ANT_TW_DIRECT3D10_INCLUDED

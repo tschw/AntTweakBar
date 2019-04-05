@@ -17,6 +17,7 @@
 #define D3D10_IGNORE_SDK_LAYERS // d3d10sdklayers.h may not exist
 #include <d3d10.h>
 
+namespace AntTweakBar {
 
 using namespace std;
 
@@ -1287,5 +1288,5 @@ void CTwGraphDirect3D10::DrawTriangles(int _NumTriangles, int *_Vertices, color3
 }
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_D3D10

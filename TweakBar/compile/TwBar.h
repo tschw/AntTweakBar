@@ -19,10 +19,15 @@
 
 #define ANT_TWEAK_BAR_DLL "AntTweakBar"
 
+extern "C" { struct CTwBar { }; }
+
+namespace AntTweakBar {
 
 //	---------------------------------------------------------------------------
 
 bool IsCustomType(int _Type);
+
+struct CTwBar;
 
 struct CTwVar
 {
@@ -41,8 +46,8 @@ struct CTwVar
 	virtual bool			IsCustom() const { return false; }
 	virtual const CTwVar *	Find(const char *_Name, struct CTwVarGroup **_Parent, int *_Index) const = 0;
 	virtual int				HasAttrib(const char *_Attrib, bool *_HasValue) const;
-	virtual int				SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex);
-	virtual ERetType		GetAttrib(int _AttribID, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDouble, std::ostringstream& outString) const;
+	virtual int				SetAttrib(int _AttribID, const char *_Value, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex);
+	virtual ERetType		GetAttrib(int _AttribID, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDouble, std::ostringstream& outString) const;
 	virtual void			SetReadOnly(bool _ReadOnly) = 0;
 	virtual bool			IsReadOnly() const = 0;
 							CTwVar();
@@ -124,8 +129,8 @@ struct CTwVarAtom : CTwVar
 	virtual void			MinMaxStepToDouble(double *_Min, double *_Max, double *_Step) const;
 	virtual const CTwVar *	Find(const char *_Name, struct CTwVarGroup **_Parent, int *_Index) const;
 	virtual int				HasAttrib(const char *_Attrib, bool *_HasValue) const;
-	virtual int				SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex);
-	virtual ERetType		GetAttrib(int _AttribID, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDouble, std::ostringstream& outString) const;
+	virtual int				SetAttrib(int _AttribID, const char *_Value, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex);
+	virtual ERetType		GetAttrib(int _AttribID, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDouble, std::ostringstream& outString) const;
 	virtual void			Increment(int _Step);
 	virtual void			SetDefaults();
 	virtual void			SetReadOnly(bool _ReadOnly) { m_ReadOnly=_ReadOnly; if( m_Type!=TW_TYPE_BUTTON && m_SetCallback==NULL && m_Ptr==NULL ) m_ReadOnly=true; }
@@ -148,8 +153,8 @@ struct CTwVarGroup : CTwVar
 	virtual bool			IsGroup() const { return true; }
 	virtual const CTwVar *	Find(const char *_Name, CTwVarGroup **_Parent, int *_Index) const;
 	virtual int				HasAttrib(const char *_Attrib, bool *_HasValue) const;
-	virtual int				SetAttrib(int _AttribID, const char *_Value, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex);
-	virtual ERetType		GetAttrib(int _AttribID, TwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDouble, std::ostringstream& outString) const;
+	virtual int				SetAttrib(int _AttribID, const char *_Value, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex);
+	virtual ERetType		GetAttrib(int _AttribID, CTwBar *_Bar, struct CTwVarGroup *_VarParent, int _VarIndex, std::vector<double>& outDouble, std::ostringstream& outString) const;
 	virtual CTwVarAtom *	FindShortcut(int _Key, int _Modifiers, bool *_DoIncr);
 	virtual void			SetReadOnly(bool _ReadOnly) { for(size_t i=0; i<m_Vars.size(); ++i) if(m_Vars[i]) m_Vars[i]->SetReadOnly(_ReadOnly); }
 	virtual bool			IsReadOnly() const { for(size_t i=0; i<m_Vars.size(); ++i) if(m_Vars[i] && !m_Vars[i]->IsReadOnly()) return false; return true; }
@@ -159,7 +164,7 @@ struct CTwVarGroup : CTwVar
 
 //	---------------------------------------------------------------------------
 
-struct CTwBar
+struct CTwBar : ::CTwBar
 {
 	std::string				m_Name;
 	std::string				m_Label;
@@ -435,6 +440,5 @@ protected:
 void DrawArc(int _X, int _Y, int _Radius, float _StartAngleDeg, float _EndAngleDeg, color32 _Color);
 
 //	---------------------------------------------------------------------------
-
-
+}
 #endif // !defined ANT_TW_BAR_INCLUDED

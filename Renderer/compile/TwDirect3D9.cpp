@@ -14,11 +14,12 @@
 
 #include <d3d9.h>
 
+namespace AntTweakBar {
+
 using namespace std;
 
 const char *g_ErrCantLoadD3D9	= "Cannot load Direct3D9 library dynamically";
 const char *g_ErrCantUnloadD3D9 = "Cannot unload Direct3D9 library";
-
 
 //	---------------------------------------------------------------------------
 
@@ -647,5 +648,5 @@ void CTwGraphDirect3D9::DrawTriangles(int _NumTriangles, int *_Vertices, color32
 }
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_D3D9

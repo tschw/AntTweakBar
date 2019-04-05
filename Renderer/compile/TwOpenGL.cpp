@@ -13,6 +13,8 @@
 #include "LoadOGL.h"
 #include "TwOpenGL.h"
 
+namespace AntTweakBar {
+
 using namespace std;
 
 static const char *g_ErrCantLoadOGL    = "Cannot load OpenGL library dynamically";
@@ -904,5 +906,5 @@ void CTwGraphOpenGL::DrawTriangles(int _NumTriangles, int *_Vertices, color32 *_
 }
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // ANT_TW_NO_LEGACY_GL

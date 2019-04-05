@@ -11,6 +11,7 @@
 #include "TwPrecomp.h"
 #include "TwColors.h"
 
+namespace AntTweakBar {
 
 void ColorRGBToHLSf(float _R, float _G, float _B, float *_Hue, float *_Light, float *_Saturation)
 {
@@ -150,4 +151,4 @@ color32 ColorBlend(color32 _Color1, color32 _Color2, float _S)
 	return Color32FromARGBf(t*a1+_S*a2, t*r1+_S*r2, t*g1+_S*g2, t*b1+_S*b2);
 }
 
-
+}

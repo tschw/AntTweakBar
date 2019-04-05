@@ -17,6 +17,8 @@
 #define D3D11_IGNORE_SDK_LAYERS // d3d11sdklayers.h may not exist
 #include <d3d11.h>
 
+namespace AntTweakBar {
+
 using namespace std;
 
 const char *g_ErrCantLoadD3D11	 = "Cannot load Direct3D11 library dynamically";
@@ -1622,5 +1624,5 @@ void CTwGraphDirect3D11::DrawTriangles(int _NumTriangles, int *_Vertices, color3
 }
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_NO_D3D11

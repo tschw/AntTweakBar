@@ -26,6 +26,8 @@
 #	include <AppKit/NSImage.h>
 #endif
 
+namespace AntTweakBar {
+
 using namespace std;
 
 CTwMgr *g_TwMgr = NULL; // current TwMgr
@@ -1251,8 +1253,10 @@ static inline float QuatIY(int y, int w, int h)
 	return (-2.0f*(float)y + (float)h - 1.0f)/QuatD(w, h);
 }
 
-void CQuaternionExt::DrawCB(int w, int h, void *_ExtValue, void *_ClientData, TwBar *_Bar, CTwVarGroup *varGrp)
+void CQuaternionExt::DrawCB(int w, int h, void *_ExtValue, void *_ClientData, TwBar *_Bar_, CTwVarGroup *varGrp)
 {
+	AntTweakBar::CTwBar* _Bar = static_cast<CTwBar*>(_Bar_);
+
 	if( g_TwMgr==NULL || g_TwMgr->m_Graph==NULL )
 		return;
 	assert( g_TwMgr->m_Graph->IsDrawing() );
@@ -1566,7 +1570,7 @@ bool CQuaternionExt::MouseMotionCB(int mouseX, int mouseY, int w, int h, void *s
 			}
 			ext->CopyToVar();
 			if( bar!=NULL )
-				bar->NotUpToDate();
+				static_cast<CTwBar*>(bar)->NotUpToDate();
 
 			ext->m_PrevX = x;
 			ext->m_PrevY = y;
@@ -1812,7 +1816,7 @@ static int TwInitMgr()
 	g_TwMgr->m_KeyPressedTextObj = g_TwMgr->m_Graph->NewTextObj();
 	g_TwMgr->m_InfoTextObj = g_TwMgr->m_Graph->NewTextObj();
 
-	g_TwMgr->m_HelpBar = TwNewBar("TW_HELP");
+	g_TwMgr->m_HelpBar = static_cast<CTwBar*>(TwNewBar("TW_HELP"));
 	if( g_TwMgr->m_HelpBar )
 	{
 		g_TwMgr->m_HelpBar->m_Label = "~ Help & Shortcuts ~";
@@ -1835,6 +1839,7 @@ static int TwInitMgr()
 	return 1;
 }
 
+} using namespace AntTweakBar;
 
 int ANT_CALL TwInit(ETwGraphAPI _GraphAPI, void *_Device)
 {
@@ -2005,6 +2010,8 @@ int ANT_CALL TwWindowExists(int wndID)
 
 int ANT_CALL TwDraw()
 {
+	using AntTweakBar::CTwBar;
+
 	PERF( PerfTimer Timer; double DT; )
 	//CTwFPU fpu;	// fpu precision only forced in update (do not modif dx draw calls)
 
@@ -2187,13 +2194,15 @@ int ANT_CALL TwWindowSize(int _Width, int _Height)
 		}
 	}
 
-	for( std::vector<TwBar*>::iterator it=g_TwMgr->m_Bars.begin(); it!=g_TwMgr->m_Bars.end(); ++it )
+	for( std::vector<AntTweakBar::CTwBar*>::iterator it=g_TwMgr->m_Bars.begin(); it!=g_TwMgr->m_Bars.end(); ++it )
 		(*it)->NotUpToDate();
 
 	return 1;
 }
 
 //	---------------------------------------------------------------------------
+
+namespace AntTweakBar {
 
 CTwMgr::CTwMgr(ETwGraphAPI _GraphAPI, void *_Device, int _WndID)
 {
@@ -2533,7 +2542,7 @@ int CTwMgr::SetAttrib(int _AttribID, const char *_Value)
 				g_TwMgr->SetLastError(g_ErrBadValue);
 				return 0;
 			}
-			vector<TwBar*>::iterator barIt;
+			vector<AntTweakBar::CTwBar*>::iterator barIt;
 			for( barIt=g_TwMgr->m_Bars.begin(); barIt!=g_TwMgr->m_Bars.end(); ++barIt )
 				if( (*barIt)!=NULL )
 					(*barIt)->m_Contained = m_Contained;
@@ -2558,7 +2567,7 @@ int CTwMgr::SetAttrib(int _AttribID, const char *_Value)
 				g_TwMgr->SetLastError(g_ErrBadValue);
 				return 0;
 			}
-			vector<TwBar*>::iterator barIt;
+			vector<AntTweakBar::CTwBar*>::iterator barIt;
 			for( barIt=g_TwMgr->m_Bars.begin(); barIt!=g_TwMgr->m_Bars.end(); ++barIt )
 				if( (*barIt)!=NULL )
 					(*barIt)->m_ButtonAlign = m_ButtonAlign;
@@ -2692,7 +2701,7 @@ ERetType CTwMgr::GetAttrib(int _AttribID, std::vector<double>& outDoubles, std::
 
 //	---------------------------------------------------------------------------
 
-void CTwMgr::Minimize(TwBar *_Bar)
+void CTwMgr::Minimize(CTwBar *_Bar)
 {
 	assert(m_Graph!=NULL && _Bar!=NULL);
 	assert(m_Bars.size()==m_MinOccupied.size());
@@ -2717,7 +2726,7 @@ void CTwMgr::Minimize(TwBar *_Bar)
 
 //	---------------------------------------------------------------------------
 
-void CTwMgr::Maximize(TwBar *_Bar)
+void CTwMgr::Maximize(CTwBar *_Bar)
 {
 	assert(m_Graph!=NULL && _Bar!=NULL);
 	assert(m_Bars.size()==m_MinOccupied.size());
@@ -2739,7 +2748,7 @@ void CTwMgr::Maximize(TwBar *_Bar)
 
 //	---------------------------------------------------------------------------
 
-void CTwMgr::Hide(TwBar *_Bar)
+void CTwMgr::Hide(CTwBar *_Bar)
 {
 	assert(m_Graph!=NULL && _Bar!=NULL);
 	if( !_Bar->m_Visible )
@@ -2758,7 +2767,7 @@ void CTwMgr::Hide(TwBar *_Bar)
 
 //	---------------------------------------------------------------------------
 
-void CTwMgr::Unhide(TwBar *_Bar)
+void CTwMgr::Unhide(CTwBar *_Bar)
 {
 	assert(m_Graph!=NULL && _Bar!=NULL);
 	if( _Bar->m_Visible )
@@ -2902,6 +2911,8 @@ void CTwMgr::SetCurrentDbgParams(const char *dbgFile, int dbgLine)
 	m_CurrentDbgLine = dbgLine;
 }
 
+} using namespace AntTweakBar;
+
 //	---------------------------------------------------------------------------
 
 int ANT_CALL __TwDbg(const char *dbgFile, int dbgLine)
@@ -2972,7 +2983,7 @@ TwBar *ANT_CALL TwNewBar(const char *_Name)
 		g_TwMgr->m_PopupBar = NULL;
 	}
 
-	TwBar *Bar = new CTwBar(_Name);
+	AntTweakBar::CTwBar *Bar = new AntTweakBar::CTwBar(_Name);
 	g_TwMgr->m_Bars.push_back(Bar);
 	g_TwMgr->m_Order.push_back((int)g_TwMgr->m_Bars.size()-1);
 	g_TwMgr->m_MinOccupied.push_back(false);
@@ -2985,6 +2996,8 @@ TwBar *ANT_CALL TwNewBar(const char *_Name)
 
 int ANT_CALL TwDeleteBar(TwBar *_Bar)
 {
+	using AntTweakBar::CTwBar;
+
 	if( g_TwMgr==NULL )
 	{
 		TwGlobalError(g_ErrNotInit);
@@ -3003,7 +3016,7 @@ int ANT_CALL TwDeleteBar(TwBar *_Bar)
 
 	TwFreeAsyncDrawing(); // For multi-thread savety
 
-	vector<TwBar*>::iterator BarIt;
+	vector<CTwBar*>::iterator BarIt;
 	int i = 0;
 	for( BarIt=g_TwMgr->m_Bars.begin(); BarIt!=g_TwMgr->m_Bars.end(); ++BarIt, ++i )
 		if( (*BarIt)==_Bar )
@@ -3021,7 +3034,7 @@ int ANT_CALL TwDeleteBar(TwBar *_Bar)
 	}
 
 	// force bar to un-minimize
-	g_TwMgr->Maximize(_Bar);
+	g_TwMgr->Maximize(static_cast<CTwBar*>(_Bar));
 	// find an empty MinOccupied
 	vector<bool>::iterator itm;
 	int j = 0;
@@ -3081,7 +3094,7 @@ int ANT_CALL TwDeleteAllBars()
 	}
 	else
 	{
-		vector<CTwBar *> bars = g_TwMgr->m_Bars;
+		vector<AntTweakBar::CTwBar *> bars = g_TwMgr->m_Bars;
 		for( size_t i = 0; i < bars.size(); ++i )
 			if( bars[i]!=0 && bars[i]!=g_TwMgr->m_HelpBar)
 			{
@@ -3119,7 +3132,7 @@ int ANT_CALL TwSetTopBar(const TwBar *_Bar)
 
 	if( _Bar!=g_TwMgr->m_PopupBar && g_TwMgr->m_BarAlwaysOnBottom.length()>0 )
 	{
-		if( strcmp(_Bar->m_Name.c_str(), g_TwMgr->m_BarAlwaysOnBottom.c_str())==0 )
+		if( strcmp(static_cast<const AntTweakBar::CTwBar*>(_Bar)->m_Name.c_str(), g_TwMgr->m_BarAlwaysOnBottom.c_str())==0 )
 			return TwSetBottomBar(_Bar);
 	}
 
@@ -3192,7 +3205,7 @@ int ANT_CALL TwSetBottomBar(const TwBar *_Bar)
 
 	if( _Bar!=g_TwMgr->m_PopupBar && g_TwMgr->m_BarAlwaysOnTop.length()>0 )
 	{
-		if( strcmp(_Bar->m_Name.c_str(), g_TwMgr->m_BarAlwaysOnTop.c_str())==0 )
+		if( strcmp(static_cast<const AntTweakBar::CTwBar*>(_Bar)->m_Name.c_str(), g_TwMgr->m_BarAlwaysOnTop.c_str())==0 )
 			return TwSetTopBar(_Bar);
 	}
 
@@ -3244,8 +3257,12 @@ TwBar* ANT_CALL TwGetBottomBar()
 
 //	---------------------------------------------------------------------------
 
-int ANT_CALL TwSetBarState(TwBar *_Bar, TwState _State)
+namespace AntTweakBar {
+
+int ANT_CALL TwSetBarState(TwBar *_Bar_, TwState _State)
 {
+	AntTweakBar::CTwBar* _Bar = static_cast<AntTweakBar::CTwBar*>(_Bar_);
+
 	if( g_TwMgr==NULL )
 	{
 		TwGlobalError(g_ErrNotInit);
@@ -3282,6 +3299,8 @@ int ANT_CALL TwSetBarState(TwBar *_Bar, TwState _State)
 	}
 }
 
+}
+
 //	---------------------------------------------------------------------------
 
 /*
@@ -3311,6 +3330,8 @@ TwState ANT_CALL TwGetBarState(const TwBar *_Bar)
 
 const char * ANT_CALL TwGetBarName(const TwBar *_Bar)
 {
+	using AntTweakBar::CTwBar;
+
 	if( g_TwMgr==NULL )
 	{
 		TwGlobalError(g_ErrNotInit);
@@ -3321,7 +3342,8 @@ const char * ANT_CALL TwGetBarName(const TwBar *_Bar)
 		g_TwMgr->SetLastError(g_ErrBadParam);
 		return NULL;
 	}
-	vector<TwBar*>::iterator BarIt;
+
+	vector<CTwBar*>::iterator BarIt;
 	int i = 0;
 	for( BarIt=g_TwMgr->m_Bars.begin(); BarIt!=g_TwMgr->m_Bars.end(); ++BarIt, ++i )
 		if( (*BarIt)==_Bar )
@@ -3332,7 +3354,7 @@ const char * ANT_CALL TwGetBarName(const TwBar *_Bar)
 		return NULL;
 	}
 
-	return _Bar->m_Name.c_str();
+	return static_cast<const CTwBar*>(_Bar)->m_Name.c_str();
 }
 
 //	---------------------------------------------------------------------------
@@ -3389,21 +3411,24 @@ TwBar * ANT_CALL TwGetBarByName(const char *name)
 
 int ANT_CALL TwRefreshBar(TwBar *bar)
 {
+	using AntTweakBar::CTwBar;
+
 	if( g_TwMgr==NULL )
 	{
 		TwGlobalError(g_ErrNotInit);
 		return 0;  // not initialized
 	}
+
 	if( bar==NULL )
 	{
-		vector<TwBar*>::iterator BarIt;
+		vector<CTwBar*>::iterator BarIt;
 		for( BarIt=g_TwMgr->m_Bars.begin(); BarIt!=g_TwMgr->m_Bars.end(); ++BarIt )
 			if( *BarIt!=NULL )
 				(*BarIt)->NotUpToDate();
 	}
 	else
 	{
-		vector<TwBar*>::iterator BarIt;
+		vector<CTwBar*>::iterator BarIt;
 		int i = 0;
 		for( BarIt=g_TwMgr->m_Bars.begin(); BarIt!=g_TwMgr->m_Bars.end(); ++BarIt, ++i )
 			if( (*BarIt)==bar )
@@ -3414,7 +3439,7 @@ int ANT_CALL TwRefreshBar(TwBar *bar)
 			return 0;
 		}
 
-		bar->NotUpToDate();
+		static_cast<CTwBar*>(bar)->NotUpToDate();
 	}
 	return 1;
 }
@@ -3429,7 +3454,7 @@ TwBar * ANT_CALL TwGetActiveBar()
 		return NULL; // not initialized
 	}
 
-	vector<TwBar*>::iterator BarIt;
+	vector<AntTweakBar::CTwBar*>::iterator BarIt;
 	for( BarIt=g_TwMgr->m_Bars.begin(); BarIt!=g_TwMgr->m_Bars.end(); ++BarIt )
 		if( *BarIt!=NULL && !(*BarIt)->IsMinimized() && !(*BarIt)->m_IsPopupList && (*BarIt)->GetFocus()==true )
 			return *BarIt;
@@ -3439,13 +3464,19 @@ TwBar * ANT_CALL TwGetActiveBar()
 
 //	---------------------------------------------------------------------------
 
+namespace AntTweakBar {
+
 int BarVarHasAttrib(CTwBar *_Bar, CTwVar *_Var, const char *_Attrib, bool *_HasValue);
 int BarVarSetAttrib(CTwBar *_Bar, CTwVar *_Var, CTwVarGroup *_VarParent, int _VarIndex, int _AttribID, const char *_Value);
 ERetType BarVarGetAttrib(CTwBar *_Bar, CTwVar *_Var, CTwVarGroup *_VarParent, int _VarIndex, int _AttribID, std::vector<double>& outDouble, std::ostringstream& outString);
 
+} using namespace AntTweakBar;
 
-int ANT_CALL TwGetParam(TwBar *bar, const char *varName, const char *paramName, TwParamValueType paramValueType, unsigned int outValueMaxCount, void *outValues)
+int ANT_CALL TwGetParam(TwBar *bar_, const char *varName, const char *paramName, TwParamValueType paramValueType, unsigned int outValueMaxCount, void *outValues)
 {
+	using AntTweakBar::CTwBar;
+	CTwBar* bar = static_cast<CTwBar*>(bar_);
+
 	CTwFPU fpu; // force fpu precision
 
 	if( g_TwMgr==NULL )
@@ -3468,7 +3499,7 @@ int ANT_CALL TwGetParam(TwBar *bar, const char *varName, const char *paramName, 
 		bar = TW_GLOBAL_BAR;
 	else
 	{
-		vector<TwBar*>::iterator barIt;
+		vector<CTwBar*>::iterator barIt;
 		int i = 0;
 		for( barIt=g_TwMgr->m_Bars.begin(); barIt!=g_TwMgr->m_Bars.end(); ++barIt, ++i )
 			if( (*barIt)==bar )
@@ -3586,8 +3617,11 @@ int ANT_CALL TwGetParam(TwBar *bar, const char *varName, const char *paramName, 
 }
 
 
-int ANT_CALL TwSetParam(TwBar *bar, const char *varName, const char *paramName, TwParamValueType paramValueType, unsigned int inValueCount, const void *inValues)
+int ANT_CALL TwSetParam(TwBar *bar_, const char *varName, const char *paramName, TwParamValueType paramValueType, unsigned int inValueCount, const void *inValues)
 {
+	using AntTweakBar::CTwBar;
+	CTwBar* bar = static_cast<CTwBar*>(bar_);
+
 	CTwFPU fpu; // force fpu precision
 
 	if( g_TwMgr==NULL )
@@ -3612,7 +3646,7 @@ int ANT_CALL TwSetParam(TwBar *bar, const char *varName, const char *paramName, 
 		bar = TW_GLOBAL_BAR;
 	else
 	{
-		vector<TwBar*>::iterator barIt;
+		vector<CTwBar*>::iterator barIt;
 		int i = 0;
 		for( barIt=g_TwMgr->m_Bars.begin(); barIt!=g_TwMgr->m_Bars.end(); ++barIt, ++i )
 			if( (*barIt)==bar )
@@ -3986,9 +4020,10 @@ static int s_SeparatorTag = 0;
 
 //	---------------------------------------------------------------------------
 
-static int AddVar(TwBar *_Bar, const char *_Name, ETwType _Type, void *_VarPtr, bool _ReadOnly, TwSetVarCallback _SetCallback, TwGetVarCallback _GetCallback, TwButtonCallback _ButtonCallback, void *_ClientData, const char *_Def)
+static int AddVar(TwBar *_Bar_, const char *_Name, ETwType _Type, void *_VarPtr, bool _ReadOnly, TwSetVarCallback _SetCallback, TwGetVarCallback _GetCallback, TwButtonCallback _ButtonCallback, void *_ClientData, const char *_Def)
 {
 	CTwFPU fpu; // force fpu precision
+	AntTweakBar::CTwBar* _Bar = static_cast<AntTweakBar::CTwBar*>(_Bar_);
 
 	if( g_TwMgr==NULL )
 	{
@@ -4333,8 +4368,10 @@ int ANT_CALL TwAddSeparator(TwBar *_Bar, const char *_Name, const char *_Def)
 
 //	---------------------------------------------------------------------------
 
-int ANT_CALL TwRemoveVar(TwBar *_Bar, const char *_Name)
+int ANT_CALL TwRemoveVar(TwBar *_Bar_, const char *_Name)
 {
+	AntTweakBar::CTwBar* _Bar = static_cast<AntTweakBar::CTwBar*>(_Bar_);
+
 	if( g_TwMgr==NULL )
 	{
 		TwGlobalError(g_ErrNotInit);
@@ -4388,8 +4425,10 @@ int ANT_CALL TwRemoveVar(TwBar *_Bar, const char *_Name)
 
 //	---------------------------------------------------------------------------
 
-int ANT_CALL TwRemoveAllVars(TwBar *_Bar)
+int ANT_CALL TwRemoveAllVars(TwBar *_Bar_)
 {
+	AntTweakBar::CTwBar* _Bar = static_cast<AntTweakBar::CTwBar*>(_Bar_);
+
 	if( g_TwMgr==NULL )
 	{
 		TwGlobalError(g_ErrNotInit);
@@ -4423,6 +4462,8 @@ int ANT_CALL TwRemoveAllVars(TwBar *_Bar)
 }
 
 //	---------------------------------------------------------------------------
+
+namespace AntTweakBar {
 
 int ParseToken(string& _Token, const char *_Def, int& Line, int& Column, bool _KeepQuotes, bool _EndCR, char _Sep1='\0', char _Sep2='\0')
 {
@@ -4620,10 +4661,14 @@ static inline std::string ErrorPosition(bool _MultiLine, int _Line, int _Column)
 	}
 }
 
+} using namespace AntTweakBar;
+
 //	---------------------------------------------------------------------------
 
 int ANT_CALL TwDefine(const char *_Def)
 {
+	using AntTweakBar::CTwBar;
+
 	CTwFPU fpu; // force fpu precision
 
 	// hack to scale fonts artificially (for retina display for instance)
@@ -5056,6 +5101,8 @@ TwType ANT_CALL TwDefineStruct(const char *_StructName, const TwStructMember *_S
 
 //	---------------------------------------------------------------------------
 
+namespace AntTweakBar {
+
 TwType ANT_CALL TwDefineStructExt(const char *_StructName, const TwStructMember *_StructExtMembers, unsigned int _NbExtMembers, size_t _StructSize, size_t _StructExtSize, TwStructExtInitCallback _StructExtInitCallback, TwCopyVarFromExtCallback _CopyVarFromExtCallback, TwCopyVarToExtCallback _CopyVarToExtCallback, TwSummaryCallback _SummaryCallback, void *_ClientData, const char *_Help)
 {
 	CTwFPU fpu; // force fpu precision
@@ -5085,7 +5132,6 @@ TwType ANT_CALL TwDefineStructExt(const char *_StructName, const TwStructMember 
 	}
 	return type;
 }
-
 
 //	---------------------------------------------------------------------------
 
@@ -5394,6 +5440,8 @@ ETwMouseButtonID TW_MOUSE_NA = (ETwMouseButtonID)(-1);
 
 static int TwMouseEvent(ETwMouseAction _EventType, TwMouseButtonID _Button, int _MouseX, int _MouseY, int _WheelPos)
 {
+	using AntTweakBar::CTwBar;
+
 	CTwFPU fpu; // force fpu precision
 
 	if( g_TwMgr==NULL || g_TwMgr->m_Graph==NULL )
@@ -5521,6 +5569,8 @@ static int TwMouseEvent(ETwMouseAction _EventType, TwMouseButtonID _Button, int 
 	return Handled ? 1 : 0;
 }
 
+} // namespace AntTweakBar
+
 int ANT_CALL TwMouseButton(ETwMouseAction _EventType, TwMouseButtonID _Button)
 {
 	return TwMouseEvent(_EventType, _Button, TW_MOUSE_NOMOTION, TW_MOUSE_NOMOTION, 0);
@@ -5599,6 +5649,8 @@ static int TranslateKey(int _Key, int _Modifiers)
 
 static int KeyPressed(int _Key, int _Modifiers, bool _TestOnly)
 {
+	using AntTweakBar::CTwBar;
+
 	CTwFPU fpu; // force fpu precision
 
 	if( g_TwMgr==NULL || g_TwMgr->m_Graph==NULL )
@@ -5746,6 +5798,8 @@ int ANT_CALL TwKeyTest(int _Key, int _Modifiers)
 }
 
 //	---------------------------------------------------------------------------
+
+namespace AntTweakBar {
 
 struct StructCompare : public binary_function<TwType, TwType, bool>
 {
@@ -6597,6 +6651,8 @@ void CTwMgr::SetCursor(CTwMgr::CCursor _Cursor)
 
 #endif //defined(ANT_UNIX)
 
+} using namespace AntTweakBar;
+
 //	---------------------------------------------------------------------------
 
 void ANT_CALL TwCopyCDStringToClientFunc(TwCopyCDStringToClient copyCDStringToClientFunc)
@@ -6680,6 +6736,8 @@ void ANT_CALL TwCopyStdStringToLibrary(std::string& destLibraryString, const std
 
 //	---------------------------------------------------------------------------
 
+namespace AntTweakBar {
+
 bool CRect::Subtract(const CRect& _Rect, vector<CRect>& _OutRects) const
 {
 	if( Empty() )
@@ -6747,5 +6805,6 @@ bool CRect::Subtract(const vector<CRect>& _Rects, vector<CRect>& _OutRects) cons
 	}
 }
 
-//	---------------------------------------------------------------------------
+} // namespace AntTweakBar
 
+//	---------------------------------------------------------------------------

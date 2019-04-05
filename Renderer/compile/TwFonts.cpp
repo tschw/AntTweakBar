@@ -11,7 +11,8 @@
 #include "TwPrecomp.h"
 #include "TwFonts.h"
 
-// Fedora patch: memset()
+namespace AntTweakBar {
+
 using std::memset;
 
 //	---------------------------------------------------------------------------
@@ -4891,3 +4892,5 @@ void TwDeleteDefaultFonts()
 }
 
 //	---------------------------------------------------------------------------
+
+}

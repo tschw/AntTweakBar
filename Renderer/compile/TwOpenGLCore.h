@@ -18,6 +18,8 @@
 
 #include "TwGraph.h"
 
+namespace AntTweakBar {
+
 //	---------------------------------------------------------------------------
 
 class CTwGraphOpenGLCore : public ITwGraph
@@ -121,6 +123,6 @@ protected:
 };
 
 //	---------------------------------------------------------------------------
-
+}
 #endif // !defined ANT_TW_No_CORE_GL
 #endif // !defined ANT_TW_OPENGL_CORE_INCLUDED
