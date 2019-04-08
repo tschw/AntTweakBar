@@ -1838,7 +1838,7 @@ static int TwInitMgr()
 	return 1;
 }
 
-} using namespace AntTweakBar;
+} using namespace AntTweakBar; extern "C" {
 
 int ANT_CALL TwInit(ETwGraphAPI _GraphAPI, void *_Device)
 {
@@ -2198,6 +2198,8 @@ int ANT_CALL TwWindowSize(int _Width, int _Height)
 
 	return 1;
 }
+
+} // extern "C"
 
 //	---------------------------------------------------------------------------
 
@@ -2917,6 +2919,7 @@ int ANT_CALL __TwDbg(const char *dbgFile, int dbgLine)
 
 //	---------------------------------------------------------------------------
 
+extern "C" {
 
 void ANT_CALL TwHandleErrors(TwErrorHandler _ErrorHandler)
 {
@@ -3242,6 +3245,8 @@ TwBar* ANT_CALL TwGetBottomBar()
 	else
 		return NULL;
 }
+
+} // extern "C"
 
 //	---------------------------------------------------------------------------
 
