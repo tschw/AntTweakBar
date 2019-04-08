@@ -22,7 +22,7 @@
 
 #include <stddef.h>
 
-#define TW_VERSION	116 // Version Mmm : M=Major mm=minor (e.g., 102 is version 1.02)
+#define TW_VERSION	117 // Version Mmm : M=Major mm=minor (e.g., 102 is version 1.02)
 
 
 #ifdef	__cplusplus
