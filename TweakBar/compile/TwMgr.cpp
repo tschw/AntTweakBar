@@ -31,7 +31,6 @@ namespace AntTweakBar {
 using namespace std;
 
 CTwMgr *g_TwMgr = NULL; // current TwMgr
-bool g_BreakOnError = false;
 TwErrorHandler g_ErrorHandler = NULL;
 int g_TabLength = 4;
 CTwBar * const TW_GLOBAL_BAR = (CTwBar *)(-1);
@@ -2838,9 +2837,6 @@ void ANT_CALL TwGlobalError(const char *_ErrorMessage)	// to be called when g_Tw
 	}
 	else
 		g_ErrorHandler(_ErrorMessage);
-
-	if( g_BreakOnError )
-		abort();
 }
 
 //	---------------------------------------------------------------------------
@@ -2876,9 +2872,6 @@ void CTwMgr::SetLastError(const char *_ErrorMessage)	// _ErrorMessage must be a 
 	}
 	else
 		g_ErrorHandler(_ErrorMessage);
-
-	if( g_BreakOnError )
-		abort();
 }
 
 //	---------------------------------------------------------------------------
@@ -2924,15 +2917,10 @@ int ANT_CALL __TwDbg(const char *dbgFile, int dbgLine)
 
 //	---------------------------------------------------------------------------
 
-void ANT_CALL TwHandleErrors(TwErrorHandler _ErrorHandler, int _BreakOnError)
-{
-	g_ErrorHandler = _ErrorHandler;
-	g_BreakOnError = (_BreakOnError) ? true : false;
-}
 
 void ANT_CALL TwHandleErrors(TwErrorHandler _ErrorHandler)
 {
-	TwHandleErrors(_ErrorHandler, false);
+	g_ErrorHandler = _ErrorHandler;
 }
 
 //	---------------------------------------------------------------------------
