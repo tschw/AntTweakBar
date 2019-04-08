@@ -19,7 +19,10 @@
 
 #define ANT_TWEAK_BAR_DLL "AntTweakBar"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 extern "C" { struct CTwBar { }; }
+#pragma GCC diagnostic pop
 
 namespace AntTweakBar {
 

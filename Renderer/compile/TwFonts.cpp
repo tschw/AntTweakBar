@@ -795,7 +795,7 @@ static const unsigned char s_Font0[] =
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
-
+#if 0 // unused
 // Normal font
 const int FONT1_BM_W = 253;
 const int FONT1_BM_H = 106;
@@ -1693,6 +1693,7 @@ static const unsigned char s_Font1[] =
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
+#endif
 
 // Normal font anti-aliased
 const int FONT1AA_BM_W = 264;

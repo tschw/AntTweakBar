@@ -46,6 +46,7 @@ ITwGraph* ITwGraph::Create(IUnknown* _D3DDevice)
 	dev = CTwGraphDirect3D9::DetectDevice(_D3DDevice);
 	if (dev != NULL) return CreateForAPI(TW_DIRECT3D9, dev);
 #endif
+	(void) dev;
 	return CreateForAPI(-1, NULL); // invalid & raises an error
 }
 

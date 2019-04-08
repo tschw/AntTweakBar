@@ -80,12 +80,15 @@ target_include_directories(${target}
 		${CMAKE_CURRENT_BINARY_DIR}
 )
 
+set(defs "")
+
 if (NOT WIN32)
 
 	if (NOT APPLE)
 		find_package(OpenGL REQUIRED)
 	else()
 		set(OPENGL_LIBRARIES "-framework Foundation" "-framework OpenGL")
+		list(APPEND defs "GL_SILENCE_DEPRECATION")
 	endif()
 
 	target_link_libraries(${target} PRIVATE ${OPENGL_LIBRARIES})
@@ -96,7 +99,6 @@ elseif (CMAKE_SIZEOF_VOID_P EQUAL 8)
 			PROPERTIES OUTPUT_NAME "${target}64")
 endif()
 
-set(defs "")
 append_unless(defs	"ANT_TW_NO_CORE_GL"		ATB_GUIRENDERER_USE_CORE_GL)
 append_unless(defs	"ANT_TW_NO_LEGACY_GL"	ATB_GUIRENDERER_USE_LEGACY_GL)
 append_unless(defs	"ANT_TW_NO_D3D11"		ATB_GUIRENDERER_USE_D3D11)
