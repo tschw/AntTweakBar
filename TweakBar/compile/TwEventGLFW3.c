@@ -53,7 +53,6 @@ static int convertModifiers(int glfwMods)
 
 int TW_CALL TwEventKeyGLFW3(GLFWwindow *window, int glfwKey, int glfwScancode, int glfwAction, int glfwMods)
 {
-	int handled = 0;
 	int mod = convertModifiers(glfwMods);
 	int testkp = ((mod&TW_KMOD_CTRL) || (mod&TW_KMOD_ALT)) ? 1 : 0;
 	int k = 0;
