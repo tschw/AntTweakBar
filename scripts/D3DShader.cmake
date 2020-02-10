@@ -1,10 +1,15 @@
 
 function(add_hlsl_header input shader type dependentSources)
 
-	find_program(ATB_D3D11_FXC fxc DOC "Direct3D 11 Shader Compiler")
+	find_program(ATB_D3D11_FXC fxc
+	PATHS  "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v10.0;InstallationFolder]/bin/x86"
+               "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v10.0;InstallationFolder]/bin/[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v10.0;ProductVersion].0/x86"
+               "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.1;InstallationFolder]/bin/x86"
+               "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.0;InstallationFolder]/bin/x86"
+               "$ENV{WindowsSdkDir}bin/x86")
 
 	if (NOT ATB_D3D11_FXC)
-		message(SEND_ERROR "No fxc.exe for Direct3D 11 available.")
+		message(SEND_ERROR "No DirectX Effects Compiler (fxc.exe) for Direct3D 11 available.")
 	endif()
 
 	get_filename_component(name ${input} NAME_WE)
