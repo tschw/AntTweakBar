@@ -1858,7 +1858,19 @@ int ANT_CALL TwInit(ETwGraphAPI _GraphAPI, void *_Device)
 	g_Wnds[TW_MASTER_WINDOW_ID] = g_TwMasterMgr;
 	g_TwMgr = g_TwMasterMgr;
 
-	TwGenerateDefaultFonts(g_FontScaling);
+	bool isD3d = true;
+	switch( _GraphAPI )
+	{
+		case TW_OPENGL:
+		case TW_OPENGL_CORE:
+			isD3d = false;
+			break;
+		default:
+			isD3d = true;
+			break;
+	}
+
+	TwGenerateDefaultFonts(g_FontScaling, isD3d);
 	g_TwMasterMgr->m_CurrentFont = g_DefaultNormalFont;
 
 	int Res = 0;
