@@ -51,7 +51,7 @@ struct CTexFont
 };
 
 
-CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeight, float _Scaling=1.0f, bool _forD3D=false);
+CTexFont *TwGenerateFont(const unsigned char *_Bitmap, int _BmWidth, int _BmHeight, float _Scaling, bool _forD3D);
 
 
 extern CTexFont *g_DefaultSmallFont;
@@ -60,7 +60,7 @@ extern CTexFont *g_DefaultLargeFont;
 extern CTexFont *g_DefaultFixed1Font;
 extern CTexFont *g_DefaultFixedRuFont;
 
-void TwGenerateDefaultFonts(float _Scaling=1.0f, bool _forD3D=false);
+void TwGenerateDefaultFonts(float _Scaling, bool _forD3D);
 void TwDeleteDefaultFonts();
 
 }
