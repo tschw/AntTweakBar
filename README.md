@@ -24,3 +24,12 @@ want to build one of the examples.
 * SFML ( http://www.sfml-dev.org )
 * DirectX SDK ( http://msdn.microsoft.com/directx )
 
+
+## Compiling
+Due to error in file D3DShader.cmake the .h files, see below, from TwDirect3D11.hlsl with fxc are created in the path AntTweakBar-master\build\Renderer and not in AntTweakBar-master\Renderer\compile. Manual copying the files to AntTweakBar-master\Renderer\compile works for compiling.
+TwDirect3D11_LineRectCstColorVS.h
+TwDirect3D11_LineRectPS.h
+TwDirect3D11_LineRectVS.h
+TwDirect3D11_TextCstColorVS.h
+TwDirect3D11_TextPS.h
+TwDirect3D11_TextVS.h
