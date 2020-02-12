@@ -1,7 +1,7 @@
 # AntTweakBar library
 
 AntTweakBar is a small and easy-to-use C/C++ library that allows programmers
-to quickly add a light and intuitive GUI into OpenGL and DirectX based 
+to quickly add a light and intuitive GUI into OpenGL and DirectX(9, 10, 11) based
 graphic programs to interactively tweak parameters.
 
 This package includes the source version of the AntTweakBar library and some
