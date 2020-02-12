@@ -39,6 +39,7 @@ int g_InitWndHeight = -1;
 TwCopyCDStringToClient	g_InitCopyCDStringToClient = NULL;
 TwCopyStdStringToClient g_InitCopyStdStringToClient = NULL;
 float g_FontScaling = 1.0f;
+bool _D3D = true;
 
 // multi-windows
 const int TW_MASTER_WINDOW_ID = 0;
@@ -1857,8 +1858,19 @@ int ANT_CALL TwInit(ETwGraphAPI _GraphAPI, void *_Device)
 	g_TwMasterMgr = new CTwMgr(_GraphAPI, _Device, TW_MASTER_WINDOW_ID);
 	g_Wnds[TW_MASTER_WINDOW_ID] = g_TwMasterMgr;
 	g_TwMgr = g_TwMasterMgr;
+	
+	switch( _GraphAPI )
+	{
+		case TW_OPENGL:
+		case TW_OPENGL_CORE:
+			_D3D = false;
+			break;
+		default:
+			_D3D = true;
+			break;
+	}
 
-	TwGenerateDefaultFonts(g_FontScaling);
+	TwGenerateDefaultFonts(g_FontScaling, _D3D);
 	g_TwMasterMgr->m_CurrentFont = g_DefaultNormalFont;
 
 	int Res = 0;
