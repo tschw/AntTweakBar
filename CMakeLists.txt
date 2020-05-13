@@ -17,6 +17,10 @@ if (APPLE)
 	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -xobjective-c++)
 endif()
 
+if (BUILD_SHARED_LIBS)
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
 add_subdirectory(Renderer)
 add_subdirectory(TweakBar)
 
