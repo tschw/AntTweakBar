@@ -72,6 +72,11 @@ set(sources
 
 add_library(${target} STATIC ${headers} ${sources})
 
+if (BUILD_SHARED_LIBS) # .we want to link this forced static lib into it
+	set_target_properties(${target}
+		PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
+
 target_include_directories(${target}
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
