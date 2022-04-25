@@ -1,6 +1,10 @@
 --- AntTweakBar library change log ---
 
-* Latest (https://github.com/tschw/AntTweakBar)
+* Latest (https://github.com/nglade-gh/AntTweakBar)
+  - Added support for SFML 2.5 event handlers
+  - Added example for SFML 2.5 (TwSimpleSFML25.cpp)
+
+* Version from https://github.com/tschw/AntTweakBar
 
   - Added top-level namespace for internal symbols for happy static linking
   - Switched to CMake-based build system adding lots of customizability

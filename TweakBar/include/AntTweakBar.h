@@ -364,6 +364,7 @@ typedef void (TW_GLUT_CALL *GLUTspecialfun)(int glutKey, int mouseX, int mouseY)
 
 // For SFML event loop
 TW_API int		TW_CALL TwEventSFML(const void *sfmlEvent, unsigned char sfmlMajorVersion, unsigned char sfmlMinorVersion);
+TW_API int		TW_CALL TwEventSFML25(const void *sfmlEvent, unsigned char sfmlMajorVersion, unsigned char sfmlMinorVersion);
 
 // For X11 event loop
 #if defined(_UNIX)
