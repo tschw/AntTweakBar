@@ -40,6 +40,8 @@ set(ATB_EVENT_HANDLER_SDL20		ON		CACHE BOOL
 set(ATB_EVENT_HANDLER_SFML		ON		CACHE BOOL
 		"Provide an event handler interface for use with SFML")
 
+set(ATB_EVENT_HANDLER_SFML25		ON		CACHE BOOL
+		"Provide an event handler interface for use with SFML 2.5")
 
 ###############################################################################
 # Files
@@ -82,6 +84,9 @@ set(sources
 	"compile/MiniSFML16.h"
 	"compile/TwEventSFML.cpp"
 
+    "compile/MiniSFML25.h"
+	"compile/TwEventSFML25.cpp"
+	
 	"compile/TwEventWin.c"
 	"compile/TwEventX11.c")
 
@@ -147,6 +152,7 @@ append_unless(defs	TW_NO_SDL12_EVENTS				ATB_EVENT_HANDLER_SDL12)
 append_unless(defs	TW_NO_SDL13_EVENTS				ATB_EVENT_HANDLER_SDL13)
 append_unless(defs	TW_NO_SDL20_EVENTS				ATB_EVENT_HANDLER_SDL20)
 append_unless(defs	TW_NO_SFML_EVENTS				ATB_EVENT_HANDLER_SFML)
+append_unless(defs	TW_NO_SFML25_EVENTS				ATB_EVENT_HANDLER_SFML25)
 
 target_compile_definitions(AntTweakBar ${defs})
 

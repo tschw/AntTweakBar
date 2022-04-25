@@ -121,3 +121,16 @@ if (ATB_GUIRENDERER_USE_LEGACY_GL AND ATB_EVENT_HANDLER_GLUT)
 
 endif()
 
+#------------------------------------------------------------------------------
+# SFML 2.5
+
+if (ATB_EVENT_HANDLER_SFML25)
+
+	find_package(SFML CONFIG)
+
+	if (SFML_FOUND)
+		add_ogl_example(TwSimpleSFML25.cpp SFML)
+	endif()
+
+endif()
+
